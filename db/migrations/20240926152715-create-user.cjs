@@ -1,4 +1,7 @@
 'use strict';
+
+const { NOW } = require('sequelize');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -17,7 +20,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      password_hash: {
+      password: {
         allowNull: false,
         type: Sequelize.STRING
       },
@@ -40,11 +43,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       joined_date: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       },
       last_login: {
-        allowNull: false,
         type: Sequelize.DATE
       },
       games: {
@@ -53,6 +55,12 @@ module.exports = {
       puzzles: {
         type: Sequelize.INTEGER
       },
+      verification_code: {
+        type: Sequelize.STRING
+      },
+      verification_code_expires_at: {
+        type: Sequelize.DATE
+      }
     });
   },
   async down(queryInterface, Sequelize) {

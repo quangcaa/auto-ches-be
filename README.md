@@ -6,5 +6,4 @@ PROJECT - Phát triển ứng dụng Web (INT3306 8) - UET
 - npm run dev
 
 ### sequelize
-- cd db 
 - npx sequelize-cli db:migrate
