@@ -60,6 +60,10 @@ module.exports = {
       },
       verification_code_expires_at: {
         type: Sequelize.DATE
+      },
+      is_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       }
     });
   },

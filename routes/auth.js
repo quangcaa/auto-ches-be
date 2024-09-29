@@ -5,7 +5,8 @@ const AuthController = require('../controllers/AuthController')
 const validateSignup = require('../middlewares/validate')
 
 router.post('/signup', validateSignup, AuthController.signup)
-// router.get('/login', AuthController.login)
-// router.get('/logout', AuthController.logout)
+router.post('/verify-email', AuthController.verifyEmail)
+router.post('/login', AuthController.login)
+router.post('/logout', AuthController.logout)
 
 module.exports = router

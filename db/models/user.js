@@ -68,6 +68,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     verification_code_expires_at: {
       type: DataTypes.DATE,
+    },
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     sequelize,

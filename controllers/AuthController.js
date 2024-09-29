@@ -5,6 +5,7 @@ const { Op } = require('sequelize')
 
 const generateVerificationCode = require('../utils/generateVerificationCode')
 const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie')
+const sendVerificationEmail = require('../mailtrap/email')
 
 class AuthController {
     // @route POST /auth/signup
@@ -40,11 +41,14 @@ class AuthController {
                 email,
                 password: hashedPassword,
                 verification_code: verificationCode,
-                verification_code_expires_at: Date.now() + 60 * 60 * 1000 // 1 hour
+                verification_code_expires_at: Date.now() + 15 * 60 * 1000 // 15 minutes
             })
 
             // jwt 
             const token = generateTokenAndSetCookie(res, user.user_id)
+
+            // verify email
+            // await sendVerificationEmail(user.email, user.username, verificationCode)
 
             const userObj = user.toJSON()
             delete userObj.password
@@ -60,6 +64,59 @@ class AuthController {
             return res.status(400).json({ success: false, message: error.message })
         }
     }
+
+    // @route POST /auth/verify-email
+    // @desc Verify email to create account
+    // @access Public
+    async verifyEmail(req, res) {
+        const { code } = req.body
+
+        try {
+            const user = await User.findOne({
+                where: {
+                    verification_code: code,
+                    verification_code_expires_at: {
+                        [Op.gt]: Date.now()
+                    }
+                }
+            })
+
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'Invalid or expired code' })
+            }
+
+            // update db
+            await User.update(
+                {
+                    is_verified: true,
+                    verification_code: null,
+                    verification_code_expires_at: null
+                },
+                {
+                    where: { user_id: user.user_id }
+                }
+            )
+
+            res.status(200).json({ success: true, message: 'Email verified successfully' })
+        } catch (error) {
+            return res.status(400).json({ success: false, message: error.message })
+        }
+    }
+
+    // @route POST /auth/login
+    // @desc Log in to play chess
+    // @access Public
+    async login(req, res) {
+
+    }
+
+    // @route POST /auth/logout
+    // @desc Log out account
+    // @access Private
+    async logout(req, res) {
+
+    }
+
 }
 
 module.exports = new AuthController()
