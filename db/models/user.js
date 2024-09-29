@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    password_hash: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -52,11 +52,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     joined_date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      defaultValue: DataTypes.NOW
     },
     last_login: {
       type: DataTypes.DATE,
-      allowNull: false,
     },
     games: {
       type: DataTypes.INTEGER,
@@ -64,9 +63,21 @@ module.exports = (sequelize, DataTypes) => {
     puzzles: {
       type: DataTypes.INTEGER,
     },
+    verification_code: {
+      type: DataTypes.STRING,
+    },
+    verification_code_expires_at: {
+      type: DataTypes.DATE,
+    },
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'User',
+    tableName: 'users',
+    timestamps: false
   });
   return User;
 };
