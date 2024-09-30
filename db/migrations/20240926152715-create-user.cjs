@@ -64,6 +64,9 @@ module.exports = {
       is_verified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+      },
+      refresh_token: {
+        type: Sequelize.STRING
       }
     });
   },
