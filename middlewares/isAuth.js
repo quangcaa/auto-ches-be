@@ -31,7 +31,7 @@ const isAuth = async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'User not found' })
     }
 
-    req.user = user.toJSON()
+    req.user_id = user.user_id
 
     next()
 }

@@ -1,6 +1,5 @@
 const bcryptjs = require('bcryptjs')
 const dotenv = require('dotenv')
-const randtoken = require('rand-token')
 const jwt = require('jsonwebtoken')
 
 dotenv.config()
@@ -9,7 +8,7 @@ const { sequelize, User } = require('../db/models')
 const { Op } = require('sequelize')
 
 const generateVerificationCode = require('../utils/generateVerificationCode')
-const { generateAccessToken, decodeToken } = require('../utils/authen')
+const { generateToken, decodeToken } = require('../utils/authen')
 const sendVerificationEmail = require('../mailtrap/email')
 
 class AuthController {
@@ -49,6 +48,34 @@ class AuthController {
                 verification_code_expires_at: Date.now() + 15 * 60 * 1000 // 15 minutes
             })
 
+            // generate access token
+            const accessTokenLife = process.env.ACCESS_TOKEN_LIFE
+            const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+            const dataForAccessToken = {
+                user_id: user.toJSON().user_id,
+            }
+            const accessToken = await generateToken(
+                dataForAccessToken,
+                accessTokenSecret,
+                accessTokenLife
+            )
+
+            // generate refresh token
+            const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE
+            const refreshTokenSecret = process.env.REFRESH_TOKEN_LIFE
+            const dataForRefreshToken = {
+                user_id: user.toJSON().user_id,
+            }
+            let refreshToken = await generateToken(
+                dataForRefreshToken,
+                refreshTokenSecret,
+                refreshTokenLife
+            )
+            await User.update(
+                { refresh_token: refreshToken },
+                { where: { user_id: user.toJSON().user_id } }
+            )
+
             // verify email
             // await sendVerificationEmail(user.email, user.username, verificationCode)
 
@@ -59,23 +86,28 @@ class AuthController {
                 success: true,
                 message: 'User created successfully',
                 user: userObj,
-                token
+                accessToken,
+                refreshToken
             })
 
         } catch (error) {
-            return res.status(400).json({ success: false, message: error.message })
+            return res.status(400).json({
+                success: false,
+                message: `Error in signup: ${error.message}`
+            })
         }
     }
 
     // @route POST /auth/verify-email
     // @desc Verify email to create account
-    // @access Public
+    // @access Private
     async verifyEmail(req, res) {
         const { code } = req.body
 
         try {
             const user = await User.findOne({
                 where: {
+                    user_id: req.user_id,
                     verification_code: code,
                     verification_code_expires_at: {
                         [Op.gt]: Date.now()
@@ -101,7 +133,10 @@ class AuthController {
 
             res.status(200).json({ success: true, message: 'Email verified successfully' })
         } catch (error) {
-            return res.status(400).json({ success: false, message: error.message })
+            return res.status(400).json({
+                success: false,
+                message: `Error in verifyEmail: ${error.message}`
+            })
         }
     }
 
@@ -138,14 +173,23 @@ class AuthController {
             const dataForAccessToken = {
                 user_id: user.user_id,
             }
-            const accessToken = await generateAccessToken(
+            const accessToken = await generateToken(
                 dataForAccessToken,
                 accessTokenSecret,
                 accessTokenLife
             )
 
             // generate refresh token
-            let refreshToken = randtoken.generate(32)
+            const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE
+            const refreshTokenSecret = process.env.REFRESH_TOKEN_LIFE
+            const dataForRefreshToken = {
+                user_id: user.user_id,
+            }
+            let refreshToken = await generateToken(
+                dataForRefreshToken,
+                refreshTokenSecret,
+                refreshTokenLife
+            )
             if (!user.refresh_token) {
                 await User.update(
                     {
@@ -160,9 +204,12 @@ class AuthController {
                 refreshToken = user.refresh_token
             }
 
-            return res.status(200).json({ success: true, message: 'Log in successfully', accessToken, refreshToken })
+            return res.status(200).json({ success: true, message: 'Logged in successfully', accessToken, refreshToken })
         } catch (error) {
-            return res.status(400).json({ success: false, message: error.message })
+            return res.status(400).json({
+                success: false,
+                message: `Error in login: ${error.message}`
+            })
         }
     }
 
@@ -195,7 +242,7 @@ class AuthController {
             // if access-token valid
             const user_id = decoded.payload.user_id
 
-            const user = await User.findOne({ where: { user_id } })
+            const user = await User.findByPk(user_id)
             if (!user) {
                 return res.status(400).json({ success: false, message: 'User does not exist' })
             }
@@ -207,7 +254,7 @@ class AuthController {
 
             // create new access-token (if refresh-token valid)
             const dataForAccessToken = { user_id }
-            const accessToken = await generateAccessToken(
+            const accessToken = await generateToken(
                 dataForAccessToken,
                 accessTokenSecret,
                 accessTokenLife,
@@ -218,7 +265,10 @@ class AuthController {
 
             return res.status(200).json({ accessToken })
         } catch (error) {
-            return res.status(400).json({ success: false, message: error.message })
+            return res.status(400).json({
+                success: false,
+                message: `Error in refreshToken: ${error.message}`
+            })
         }
     }
 
@@ -226,8 +276,40 @@ class AuthController {
     // @desc Log out account
     // @access Private
     async logout(req, res) {
-        console.log(req.user)
-        return res.status(200).json({ success: true })
+        try {
+            // get access-token from header
+            const accessTokenFromHeader = req.headers.x_authorization
+            if (!accessTokenFromHeader) {
+                return res.status(400).json({ success: false, message: 'Access token is missing' })
+            }
+
+            // decode access-token
+            const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+            const decoded = await decodeToken(accessTokenFromHeader, accessTokenSecret)
+            if (!decoded) {
+                return res.status(400).json({ success: false, message: 'Invalid access token' })
+            }
+
+            // find user by user_id from decoded token
+            const user_id = decoded.payload.user_id
+            const user = await User.findByPk(user_id)
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User does not exist' })
+            }
+
+            // set refresh_token to null
+            await User.update(
+                { refresh_token: null },
+                { where: { user_id } }
+            )
+
+            return res.status(200).json({ success: true, message: 'Logged out successfully' })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in logout: ${error.message}`
+            })
+        }
     }
 }
 

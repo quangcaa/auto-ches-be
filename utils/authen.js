@@ -4,7 +4,7 @@ const promisify = require('util').promisify
 const sign = promisify(jwt.sign).bind(jwt)
 const verify = promisify(jwt.verify).bind(jwt)
 
-const generateAccessToken = async (payload, secretSignature, tokenLife) => {
+const generateToken = async (payload, secretSignature, tokenLife) => {
     try {
         return await sign(
             {
@@ -17,7 +17,7 @@ const generateAccessToken = async (payload, secretSignature, tokenLife) => {
             }
         )
     } catch (error) {
-        console.log(`Error in generate access token: ${error}`)
+        console.log(`Error in generate token: ${error}`)
         return null
     }
 }
@@ -42,4 +42,4 @@ const verifyToken = async (token, secretKey) => {
     }
 }
 
-module.exports = { generateAccessToken, decodeToken, verifyToken }
+module.exports = { generateToken, decodeToken, verifyToken }
