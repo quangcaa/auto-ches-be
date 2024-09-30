@@ -27,6 +27,7 @@
     "jsonwebtoken": "^9.0.2",
     "mailtrap": "^3.4.0",
     "mysql2": "^3.11.3",
+    "rand-token": "^1.0.1",
     "sequelize": "^6.37.3"
   },
   "devDependencies": {
