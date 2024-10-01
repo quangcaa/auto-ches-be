@@ -7,7 +7,7 @@ const ProfileController = require('../controllers/ProfileController');
 router.get('/bio', ProfileController.getUserProfileById);
 
 // Route để cập nhật thông tin hồ sơ người dùng
-router.put('/bio', ProfileController.updateUserProfile);
+router.put('/bio/update', ProfileController.updateUserProfile);
 
 // Route để lấy danh sách bạn bè của người dùng
 router.get('/friends', ProfileController.getFriend);
