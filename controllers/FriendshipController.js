@@ -2,86 +2,94 @@ const { sequelize, User, Friendship } = require('../db/models');
 const { Op } = require('sequelize');
 
 class FriendshipController {
-    // Return user's friends along with their profile (API).
-    async getFriend(req, res) {
-        const userId = parseInt(req.query.id); 
-        const query = `
-            SELECT u.user_id, u.username, u.profile_picture, u.dob, u.country
-            FROM friendships f
-            JOIN users u ON (u.user_id = CASE 
-                                            WHEN f.user_id = :userId THEN f.friend_id 
-                                            ELSE f.user_id 
-                                        END)
-            WHERE f.status = 'accepted' AND (f.user_id = :userId OR f.friend_id = :userId);
-        `;
+    // Decline and delete a friend request (API).
+    async declineFriendRequest(req, res) {
+        const user_id = req.user_id;
+        const friend_id = parseInt(req.query.id);
 
         try {
-            const results = await sequelize.query(query, {
-                replacements: { userId },
-                type: sequelize.QueryTypes.SELECT
+            const deletedRequests = await Friendship.destroy({
+                where: {
+                    [Op.or]: [
+                        { user_id: friend_id, friend_id: user_id},
+                        { user_id: user_id, friend_id: friend_id}
+                    ]
+                }
             });
 
-            res.status(200).json({
-                friend_count: results.length,
-                friends: results
-            });
+            if (deletedRequests === 0) {
+                return res.status(404).json({ error: "Friend request not found or already processed!" });
+            }
+
+            res.status(200).json({ message: "Friend request declined and deleted successfully!" });
         } catch (error) {
-            console.error("Error in getting user's friends: ", error);
-            res.status(500).json({ error: "Error in getting user's friends!" });
+            console.error("Error declining friend request: ", error);
+            res.status(500).json({ error: "Error declining friend request!" });
         }
     }
 
-    // Return user's friend requests that are pending (API).
-    // This API IS only used for my profile !!!
-    async getPendingFriendRequests(req, res) {
-        const userId = parseInt(req.query.id); 
-        const query = `
-            SELECT u.user_id, u.username, u.profile_picture, u.dob, u.country
-            FROM friendships f
-            JOIN users u ON u.user_id = f.friend_id
-            WHERE f.status = 'pending' AND f.user_id = :userId;
-        `;
+    // Send a friend request (API).
+    async sendFriendRequest(req, res) {
+        const user_id = req.user_id;
+        const friend_id = parseInt(req.query.id);
 
         try {
-            const results = await sequelize.query(query, {
-                replacements: { userId },
-                type: sequelize.QueryTypes.SELECT
+            const existingRequest = await Friendship.findOne({
+                where: {
+                    [Op.or]: [
+                        { user_id: user_id, friend_id: friend_id },
+                        { user_id: friend_id, friend_id: user_id }
+                    ],
+                    status: 'pending'
+                }
             });
 
-            res.status(200).json({
-                pending_request_count: results.length,
-                pendingRequests: results
+            if (existingRequest) {
+                return res.status(400).json({ message: "Friend request already exists!" });
+            }
+
+            const newFriendship = await Friendship.create({
+                user_id: user_id,
+                friend_id: friend_id,
+                status: 'pending',
+                created_at: sequelize.fn('NOW'),
+                updated_at: sequelize.fn('NOW')
             });
+
+            res.status(201).json({ message: "Friend request sent successfully!", friendship: newFriendship });
         } catch (error) {
-            console.error("Error in getting pending friend requests: ", error);
-            res.status(500).json({ error: "Error in getting pending friend requests!" });
+            console.log(error)
+            res.status(500).json({ error: "Error sending friend request!" });
         }
     }
 
-    // Return friend requests sent to the user (API).
-    // This API IS only used for my profile !!!
-    async getFriendRequestsFromOthers(req, res) {
-        const userId = parseInt(req.query.id);
-        const query = `
-            SELECT u.user_id, u.username, u.profile_picture, u.dob, u.country
-            FROM friendships f
-            JOIN users u ON u.user_id = f.user_id
-            WHERE f.status = 'pending' AND f.friend_id = :userId;
-        `;
+
+    // Accept a friend request (API).
+    async acceptFriendRequest(req, res) {
+        const userId = req.user_id;
+        const friendId = parseInt(req.query.id);
 
         try {
-            const results = await sequelize.query(query, {
-                replacements: { userId },
-                type: sequelize.QueryTypes.SELECT
+            const friendRequest = await Friendship.findOne({
+                where: {
+                    user_id: friendId,
+                    friend_id: userId,
+                    status: 'pending'
+                }
             });
 
-            res.status(200).json({
-                request_count: results.length,
-                friendRequests: results
-            });
+            if (!friendRequest) {
+                return res.status(404).json({ error: "Friend request not found!" });
+            }
+
+            friendRequest.status = 'accepted';
+            friendRequest.updated_at = sequelize.fn('NOW');
+            await friendRequest.save();
+
+            res.status(200).json({ message: "Friend request accepted successfully!" });
         } catch (error) {
-            console.error("Error in getting friend requests from others: ", error);
-            res.status(500).json({ error: "Error in getting friend requests from others!" });
+            console.error("Error accepting friend request: ", error);
+            res.status(500).json({ error: "Error accepting friend request!" });
         }
     }
 }
