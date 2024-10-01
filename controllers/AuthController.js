@@ -1,6 +1,6 @@
 const bcryptjs = require('bcryptjs')
 const dotenv = require('dotenv')
-const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 
 dotenv.config()
 
@@ -310,6 +310,42 @@ class AuthController {
                 message: `Error in logout: ${error.message}`
             })
         }
+    }
+
+    // @route POST /auth/forgot-password
+    // @desc Send reset password link to email
+    // @access Public
+    async forgotPassword(req, res) {
+        const { email } = req.body
+
+        try {
+            const user = await User.findOne({ where: { email } })
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // generate reset token
+            const resetToken = crypto.randomBytes(20).toString('hex')
+            const resetTokenExpiresAt = Date.now() * 15 * 60 * 1000 // 15 mins
+
+
+        } catch (error) {
+
+        }
+    }
+
+    // @route POST /auth/reset-password
+    // @desc ....
+    // @access ....
+    async resetPassword(req, res) {
+        return res.status(200).json({ success: true, message: 'test' })
+    }
+
+    // @route POST /auth/change-password
+    // @desc ....
+    // @access ....
+    async changePassword(req, res) {
+        return res.status(200).json({ success: true, message: 'test' })
     }
 }
 
