@@ -3,13 +3,13 @@ const router = express.Router();
 
 const FriendshipController = require('../controllers/FriendshipController');
 
-// Route to get user's friends
-router.get('/friends', FriendshipController.getFriend);
+// Route để gửi yêu cầu kết bạn
+router.post('/bio', FriendshipController.sendFriendRequest);
 
-// Route to get pending friend requests
-router.get('/pending-requests', FriendshipController.getPendingFriendRequests);
+// Route để chấp nhận yêu cầu kết bạn
+router.put('/bio', FriendshipController.acceptFriendRequest);
 
-// Route to get received friend requests (friend requests sent by others)
-router.get('/friend-invites', FriendshipController.getFriendRequestsFromOthers);
+// Route để từ chối yêu cầu kết bạn
+router.delete('/bio', FriendshipController.declineFriendRequest);
 
 module.exports = router;
