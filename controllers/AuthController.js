@@ -1,15 +1,15 @@
 const bcryptjs = require('bcryptjs')
 const dotenv = require('dotenv')
-const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 
 dotenv.config()
 
-const { sequelize, User } = require('../db/models')
+const { sequelize, User, Passwordreset } = require('../db/models')
 const { Op } = require('sequelize')
 
 const generateVerificationCode = require('../utils/generateVerificationCode')
 const { generateToken, decodeToken } = require('../utils/authen')
-const sendVerificationEmail = require('../mailtrap/email')
+const { sendVerificationEmail, sendPasswordResetEmail } = require('../mailtrap/email')
 
 class AuthController {
     // @route POST /auth/signup
@@ -308,6 +308,123 @@ class AuthController {
             return res.status(400).json({
                 success: false,
                 message: `Error in logout: ${error.message}`
+            })
+        }
+    }
+
+    // @route POST /auth/forgot-password
+    // @desc Send reset password link to email
+    // @access Public
+    async forgotPassword(req, res) {
+        const { email } = req.body
+
+        try {
+            const user = await User.findOne({ where: { email } })
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // generate reset token
+            const resetToken = crypto.randomBytes(20).toString('hex')
+            const resetTokenExpiresAt = Date.now() + 15 * 60 * 1000 // 15 minutes
+
+            // create record 
+            await Passwordreset.create({
+                user_id: user.user_id,
+                reset_password_token: resetToken,
+                reset_password_expires_at: resetTokenExpiresAt,
+            })
+
+            // send email
+            await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}:${process.env.PORT}/reset-password/${resetToken}`)
+
+            return res.status(200).json({ success: true, message: 'Password reset link sent to your email' })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in forgotPassword: ${error.message}`
+            })
+        }
+    }
+
+    // @route POST /auth/reset-password/:token
+    // @desc reset old password, create new one 
+    // @access Public
+    async resetPassword(req, res) {
+        const { token } = req.params
+        const { password } = req.body
+
+        try {
+            // check token
+            const resetRequest = await Passwordreset.findOne({
+                where: {
+                    reset_password_token: token,
+                    reset_password_expires_at: {
+                        [Op.gt]: Date.now()
+                    }
+                }
+            })
+            if (!resetRequest) {
+                return res.status(400).json({ success: false, message: 'Invalid or expired token' })
+            }
+
+            // hash new password
+            const hashedPassword = await bcryptjs.hash(password, 12)
+
+            // udpate new password
+            await User.update(
+                { password: hashedPassword },
+                { where: { user_id: resetRequest.user_id } }
+            )
+
+            resetRequest.reset_password_token = null
+            resetRequest.reset_password_expires_at = null
+            await resetRequest.save()
+
+            return res.status(200).json({ success: true, message: 'Password reset successfully' })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in resetPassword: ${error.message}`
+            })
+        }
+    }
+
+    // @route POST /auth/change-password
+    // @desc change password in setting
+    // @access Private
+    async changePassword(req, res) {
+        const user_id = req.user_id
+        const { current_password, new_password, retype_new_password } = req.body
+
+        try {
+            const user = await User.findByPk(user_id)
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // check current_password
+            const isCurrentPasswordValid = bcryptjs.compareSync(current_password, user.password)
+            if (!isCurrentPasswordValid) {
+                return res.status(400).json({ success: false, message: 'Current password is wrong' })
+            }
+
+            // check retype password
+            if (new_password !== retype_new_password) {
+                return res.status(400).json({ success: false, message: 'The password fields must match' })
+            }
+
+            // hash new password & update
+            const hashedNewPassword = await bcryptjs.hash(new_password, 12)
+            user.password = hashedNewPassword
+            await user.save()
+
+            return res.status(200).json({ success: false, message: 'Password changed successfully' })
+
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in changePassword: ${error.message}`
             })
         }
     }

@@ -11,8 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Chessboard.belongsTo(models.Game, { 
-        as: 'chessboard_game_id_fk', 
+      Chessboard.belongsTo(models.Game, {
+        as: 'chessboard_game_id_fk',
         foreignKey: 'game_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
@@ -51,7 +51,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Chessboard',
-    tableName: 'chessboards'
+    tableName: 'chessboards',
+    timestamps: false,
   });
   return Chessboard;
 };
