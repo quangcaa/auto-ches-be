@@ -4,12 +4,12 @@ const crypto = require('crypto')
 
 dotenv.config()
 
-const { sequelize, User } = require('../db/models')
+const { sequelize, User, Passwordreset } = require('../db/models')
 const { Op } = require('sequelize')
 
 const generateVerificationCode = require('../utils/generateVerificationCode')
 const { generateToken, decodeToken } = require('../utils/authen')
-const sendVerificationEmail = require('../mailtrap/email')
+const { sendVerificationEmail, sendPasswordResetEmail } = require('../mailtrap/email')
 
 class AuthController {
     // @route POST /auth/signup
@@ -326,19 +326,68 @@ class AuthController {
 
             // generate reset token
             const resetToken = crypto.randomBytes(20).toString('hex')
-            const resetTokenExpiresAt = Date.now() * 15 * 60 * 1000 // 15 mins
+            const resetTokenExpiresAt = Date.now() + 15 * 60 * 1000 // 15 minutes
 
+            // create record 
+            await Passwordreset.create({
+                user_id: user.user_id,
+                reset_password_token: resetToken,
+                reset_password_expires_at: resetTokenExpiresAt,
+            })
 
+            // send email
+            await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}:${process.env.PORT}/reset-password/${resetToken}`)
+
+            return res.status(200).json({ success: true, message: 'Password reset link sent to your email' })
         } catch (error) {
-
+            return res.status(400).json({
+                success: false,
+                message: `Error in forgotPassword: ${error.message}`
+            })
         }
     }
 
-    // @route POST /auth/reset-password
-    // @desc ....
-    // @access ....
+    // @route POST /auth/reset-password/:token
+    // @desc reset old password, create new one 
+    // @access Public
     async resetPassword(req, res) {
-        return res.status(200).json({ success: true, message: 'test' })
+        const { token } = req.params
+        const { password } = req.body
+
+        try {
+            // check token
+            const resetRequest = await Passwordreset.findOne({
+                where: {
+                    reset_password_token: token,
+                    reset_password_expires_at: {
+                        [Op.gt]: Date.now()
+                    }
+                }
+            })
+            if (!resetRequest) {
+                return res.status(400).json({ success: false, message: 'Invalid or expired token' })
+            }
+
+            // hash new password
+            const hashedPassword = await bcryptjs.hash(password, 12)
+
+            // udpate new password
+            await User.update(
+                { password: hashedPassword },
+                { where: { user_id: resetRequest.user_id } }
+            )
+
+            resetRequest.reset_password_token = null
+            resetRequest.reset_password_expires_at = null
+            await resetRequest.save()
+
+            return res.status(200).json({ success: true, message: 'Password reset successfully' })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in resetPassword: ${error.message}`
+            })
+        }
     }
 
     // @route POST /auth/change-password

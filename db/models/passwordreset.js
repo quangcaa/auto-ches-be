@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Notification extends Model {
+  class Passwordreset extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,16 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Notification.belongsTo(models.User, { 
-        as: 'notification_user_id_fk', 
+      Passwordreset.belongsTo(models.User, { 
+        as: 'passwordreset_user_id_fk', 
         foreignKey: 'user_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
     }
   }
-  Notification.init({
-    notification_id: {
+  Passwordreset.init({
+    password_reset_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       autoIncrement: true,
@@ -36,28 +36,22 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    type: {
-      type: DataTypes.ENUM('friend-request', 'inbox', 'game-invitation', 'move-reminder'),
+    reset_password_token: {
+      type: DataTypes.STRING
+    },
+    reset_password_expires_at: {
+      type: DataTypes.DATE
+    },
+    createdAt: {
       allowNull: false,
-    },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    is_read: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW
-    }
+      defaultValue: DataTypes.NOW,
+    },
   }, {
     sequelize,
-    modelName: 'Notification',
-    tableName: 'notifications',
-    timestamps: false,
+    modelName: 'Passwordreset',
+    tableName: 'passwordresets',
+    timestamps: false
   });
-  return Notification;
+  return Passwordreset;
 };
