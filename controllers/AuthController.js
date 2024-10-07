@@ -389,45 +389,6 @@ class AuthController {
             })
         }
     }
-
-    // @route POST /auth/change-password
-    // @desc change password in setting
-    // @access Private
-    async changePassword(req, res) {
-        const user_id = req.user_id
-        const { current_password, new_password, retype_new_password } = req.body
-
-        try {
-            const user = await User.findByPk(user_id)
-            if (!user) {
-                return res.status(400).json({ success: false, message: 'User not found' })
-            }
-
-            // check current_password
-            const isCurrentPasswordValid = bcryptjs.compareSync(current_password, user.password)
-            if (!isCurrentPasswordValid) {
-                return res.status(400).json({ success: false, message: 'Current password is wrong' })
-            }
-
-            // check retype password
-            if (new_password !== retype_new_password) {
-                return res.status(400).json({ success: false, message: 'The password fields must match' })
-            }
-
-            // hash new password & update
-            const hashedNewPassword = await bcryptjs.hash(new_password, 12)
-            user.password = hashedNewPassword
-            await user.save()
-
-            return res.status(200).json({ success: false, message: 'Password changed successfully' })
-
-        } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: `Error in changePassword: ${error.message}`
-            })
-        }
-    }
 }
 
 module.exports = new AuthController()
