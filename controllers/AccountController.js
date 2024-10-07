@@ -123,6 +123,37 @@ class AccountController {
             })
         }
     }
+
+    // @route POST /account/close-account
+    // @desc close account permanent
+    // @access Private
+    async closeAccount(req, res) {
+        const user_id = req.user_id
+        const { password } = req.body
+
+        try {
+            const user = await User.findByPk(user_id)
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // check password
+            const isPasswordValid = bcryptjs.compareSync(password, user.password)
+            if (!isPasswordValid) {
+                return res.status(400).json({ success: false, message: 'Incorrect password' })
+            }
+
+            // delete the account
+            await User.destroy({ where: { user_id } })
+
+            return res.status(200).json({ success: false, message: 'Account deleted :(' })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in closeAccount: ${error.message}`
+            })
+        }
+    }
 }
 
 module.exports = new AccountController()
