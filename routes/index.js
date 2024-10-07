@@ -1,4 +1,5 @@
 const authRouter = require('./auth')
+const accountRouter = require('./account')
 const inboxRouter = require('./inbox')
 const puzzleRouter = require('./puzzle')
 const forumRouter = require('./forum')
@@ -9,6 +10,7 @@ const friendshipRouter = require('./friendship')
 
 const route = (app) => {
     app.use('/auth', authRouter)
+    app.use('/account', accountRouter)
     app.use('/profile', profileRouter)
     app.use('/profile', friendshipRouter)
     app.use('/inbox', inboxRouter)
