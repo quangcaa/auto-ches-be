@@ -32,24 +32,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    first_name: {
-      type: DataTypes.STRING,
-    },
-    last_name: {
-      type: DataTypes.STRING,
-    },
-    profile_picture: {
-      type: DataTypes.STRING,
-    },
-    bio: {
-      type: DataTypes.TEXT,
-    },
-    dob: {
-      type: DataTypes.DATEONLY,
-    },
-    country: {
-      type: DataTypes.STRING,
-    },
     joined_date: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
@@ -57,21 +39,15 @@ module.exports = (sequelize, DataTypes) => {
     last_login: {
       type: DataTypes.DATE,
     },
-    games: {
-      type: DataTypes.INTEGER,
-    },
-    puzzles: {
-      type: DataTypes.INTEGER,
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     verification_code: {
       type: DataTypes.STRING,
     },
     verification_code_expires_at: {
       type: DataTypes.DATE,
-    },
-    is_verified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
     },
     refresh_token: {
       type: DataTypes.STRING

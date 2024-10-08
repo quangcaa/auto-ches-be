@@ -9,6 +9,27 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      variant_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'variants',
+          key: 'variant_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      time_control_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'timeControls',
+          key: 'time_control_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      rated: {
+        type: Sequelize.BOOLEAN,
+      },
       white_player_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
@@ -29,10 +50,6 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      time_control: {
-        type: Sequelize.ENUM,
-        values: ['blitz', 'bullet', 'rapid']
-      },
       start_time: {
         allowNull: false,
         type: Sequelize.DATE
@@ -49,7 +66,12 @@ module.exports = {
       },
       move_number: {
         type: Sequelize.INTEGER
-      }
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      },
     });
   },
   async down(queryInterface, Sequelize) {

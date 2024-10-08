@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Friendship extends Model {
+  class Follow extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,28 +11,28 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Friendship.belongsTo(models.User, { 
-        as: 'friendship_user_id_fk', 
-        foreignKey: 'user_id',
+      Follow.belongsTo(models.User, { 
+        as: 'follow_follower_id_fk', 
+        foreignKey: 'follower_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
-      Friendship.belongsTo(models.User, { 
-        as: 'friendship_friend_id_fk', 
-        foreignKey: 'friend_id',
+      Follow.belongsTo(models.User, { 
+        as: 'follow_following_id_fk', 
+        foreignKey: 'following_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
     }
   }
-  Friendship.init({
-    friendship_id: {
+  Follow.init({
+    follow_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
     },
-    user_id: {
+    follower_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    friend_id: {
+    following_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -51,25 +51,16 @@ module.exports = (sequelize, DataTypes) => {
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
-    },
-    status: {
-      type: DataTypes.ENUM('pending', 'accepted', 'declined', 'blocked'),
-      allowNull: false,
-      defaultValue: 'pending'
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    }
   }, {
     sequelize,
-    modelName: 'Friendship',
-    tableName: 'friendships',
-    timestamps: false,
+    modelName: 'Follow',
+    tableName: 'follows',
+    timestamps: false
   });
-  return Friendship;
+  return Follow;
 };

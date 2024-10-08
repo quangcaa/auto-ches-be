@@ -23,6 +23,18 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
+      Game.belongsTo(models.Variant, { 
+        as: 'game_variant_id_fk', 
+        foreignKey: 'variant_id',
+        onUpdate: 'CASCASE',
+        onDelete: 'CASCADE'
+      });
+      Game.belongsTo(models.TimeControl, { 
+        as: 'game_time_control_id_fk', 
+        foreignKey: 'time_control_id',
+        onUpdate: 'CASCASE',
+        onDelete: 'CASCADE'
+      });
     }
   }
   Game.init({
@@ -31,6 +43,27 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
+    },
+    variant_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'variants',
+        key: 'variant_id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
+    time_control_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'timeControls',
+        key: 'time_control_id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
+    rated: {
+      type: DataTypes.BOOLEAN,
     },
     white_player_id: {
       type: DataTypes.INTEGER,
@@ -52,9 +85,6 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    time_control: {
-      type: DataTypes.ENUM('blitz', 'bullet', 'rapid'),
-    },
     start_time: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -70,6 +100,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     move_number: {
       type: DataTypes.INTEGER,
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
     },
   }, {
     sequelize,
