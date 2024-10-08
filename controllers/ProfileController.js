@@ -1,11 +1,13 @@
-const { sequelize, User, Friendship, Game } = require('../db/models');
+const { sequelize, User, Friendship, Game } = require('../db/models')
 
 class ProfileController {
-    // Return user profile (API).
-    async getUserProfileById(req, res) {
-        const id = parseInt(req.query.id);
-        const currentUserId = req.user_id;
-    
+    // @route GET /@/:username
+    // @desc get user profile
+    // @access Private
+    async getUserProfile(req, res) {
+        const { user_id } = req.params
+        const currentUserId = req.user_id
+
         try {
             const rawQuery = `
                 SELECT u.user_id, u.username, u.email, u.first_name, u.last_name, 
@@ -47,7 +49,6 @@ class ProfileController {
                         ) AS limited_games
                     ) AS recent_games,
 
-    
                     (
                         SELECT f.status 
                         FROM friendships f 
@@ -59,13 +60,13 @@ class ProfileController {
                 FROM users u
                 WHERE u.user_id = :userId;
             `;
-    
+
             let result = await sequelize.query(rawQuery, {
                 replacements: { userId: id, currentUserId },
                 type: sequelize.QueryTypes.SELECT,
                 plain: true
             });
-    
+
             if (!result) {
                 return res.status(404).json({ error: "User profile does not exist!" });
             }
@@ -100,142 +101,41 @@ class ProfileController {
                             FROM friendships f
                             WHERE f.status = 'pending' AND f.friend_id = :currentUserId
                         ) AS invitation_count`;
-    
+
                 const additionalResult = await sequelize.query(additionalQuery, {
                     replacements: { currentUserId },
                     type: sequelize.QueryTypes.SELECT,
                     plain: true
                 });
-    
+
                 result = { ...result, ...additionalResult };
             } else {
                 if (result.friendship_status === null) {
                     result.friendship_status = "no";
                 }
             }
-            
+
             res.status(200).json(result);
         } catch (error) {
             console.error("Error in getting user profile: ", error);
             res.status(500).json({ error: "Error in getting user profile!" });
         }
     }
-    
 
-    // Update user profile (API).
-    // This API IS only used for my profile !!!
-    async updateUserProfile(req, res) {
-        const id = parseInt(req.query.id);
-        const { username, email, first_name, last_name, profile_picture, bio, dob, country } = req.body;
-    
-        try {
-            const user = await User.findByPk(id, {
-                attributes: ['user_id', 'username', 'email', 'first_name', 'last_name', 'profile_picture', 'bio', 'dob', 'country']
-            });
-            
-            if (!user) {
-                return res.status(404).json({ error: "User not found!" });
-            }
-    
-            user.username = username || user.username;
-            user.email = email || user.email;
-            user.first_name = first_name || user.first_name;
-            user.last_name = last_name || user.last_name;
-            user.profile_picture = profile_picture || user.profile_picture;
-            user.bio = bio || user.bio;
-            user.dob = dob || user.dob;
-            user.country = country || user.country;
-
-            await user.save();
-            res.status(200).json({ message: "Profile updated successfully!", user });
-        } catch (error) {
-            console.error("Error updating user profile: ", error);
-            res.status(500).json({ error: "Error updating user profile!" });
-        }
-    }
-
-    // Return user's friends along with their profile (API).
-    async getFriend(req, res) {
-        const userId = parseInt(req.query.id); 
-        const query = `
-            SELECT u.user_id, u.username, u.profile_picture, u.dob, u.country
-            FROM friendships f
-            JOIN users u ON (u.user_id = CASE 
-                                            WHEN f.user_id = :userId THEN f.friend_id 
-                                            ELSE f.user_id 
-                                        END)
-            WHERE f.status = 'accepted' AND (f.user_id = :userId OR f.friend_id = :userId);
-        `;
+    // @route GET /@/:username/following
+    // @desc get all user's following
+    // @access Private
+    async getAllFollowing(req, res) {
+        const { username } = req.params
 
         try {
-            const results = await sequelize.query(query, {
-                replacements: { userId },
-                type: sequelize.QueryTypes.SELECT
-            });
-
-            res.status(200).json({
-                friend_count: results.length,
-                friends: results
-            });
         } catch (error) {
-            console.error("Error in getting user's friends: ", error);
-            res.status(500).json({ error: "Error in getting user's friends!" });
-        }
-    }
-
-    // Return user's friend requests that are pending (API).
-    // This API IS only used for my profile !!!
-    async getPendingFriendRequests(req, res) {
-        const userId = parseInt(req.query.id); 
-        const query = `
-            SELECT u.user_id, u.username, u.profile_picture, u.dob, u.country
-            FROM friendships f
-            JOIN users u ON u.user_id = f.friend_id
-            WHERE f.status = 'pending' AND f.user_id = :userId;
-        `;
-
-        try {
-            const results = await sequelize.query(query, {
-                replacements: { userId },
-                type: sequelize.QueryTypes.SELECT
-            });
-
-            res.status(200).json({
-                pending_request_count: results.length,
-                pendingRequests: results
-            });
-        } catch (error) {
-            console.error("Error in getting pending friend requests: ", error);
-            res.status(500).json({ error: "Error in getting pending friend requests!" });
-        }
-    }
-
-    // Return friend requests sent to the user (API).
-    // This API IS only used for my profile !!!
-    async getFriendRequestsFromOthers(req, res) {
-        const userId = parseInt(req.query.id);
-        const query = `
-            SELECT u.user_id, u.username, u.profile_picture, u.dob, u.country
-            FROM friendships f
-            JOIN users u ON u.user_id = f.user_id
-            WHERE f.status = 'pending' AND f.friend_id = :userId;
-        `;
-
-        try {
-            const results = await sequelize.query(query, {
-                replacements: { userId },
-                type: sequelize.QueryTypes.SELECT
-            });
-
-            res.status(200).json({
-                request_count: results.length,
-                friendRequests: results
-            });
-        } catch (error) {
-            console.error("Error in getting friend requests from others: ", error);
-            res.status(500).json({ error: "Error in getting friend requests from others!" });
+            return res.status(400).json({
+                success: false,
+                message: `Error in getAllFollowing: ${error.message}`
+            })
         }
     }
 }
 
-module.exports = new ProfileController();
+module.exports = new ProfileController()
