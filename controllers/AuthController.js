@@ -4,7 +4,7 @@ const crypto = require('crypto')
 
 dotenv.config()
 
-const { sequelize, User, Passwordreset } = require('../db/models')
+const { sequelize, User, Passwordreset, Profile } = require('../db/models')
 const { Op } = require('sequelize')
 
 const generateVerificationCode = require('../utils/generateVerificationCode')
@@ -46,6 +46,11 @@ class AuthController {
                 password: hashedPassword,
                 verification_code: verificationCode,
                 verification_code_expires_at: Date.now() + 15 * 60 * 1000 // 15 minutes
+            })
+
+            // create user profile
+            const profile = await Profile.create({
+                user_id : user.toJSON().user_id
             })
 
             // generate access token

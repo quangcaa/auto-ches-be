@@ -1,11 +1,60 @@
 const bcryptjs = require('bcryptjs')
 const crypto = require('crypto')
 
-const { sequelize, User } = require('../db/models')
+const { sequelize, User, Profile } = require('../db/models')
 const { Op } = require('sequelize')
 const { check } = require('express-validator')
+const { profile } = require('console')
 
 class AccountController {
+    // @route [GET] /account/my-profile
+    // @desc get my profile in efit setting
+    // @access Private
+    async getMyProfile(req, res) {
+        const user_id = req.user_id
+
+        try {
+            const myProfile = await Profile.findByPk(user_id)
+            if (!myProfile) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            return res.status(200).json({ success: true, profile: myProfile })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in getMyProfile: ${error.message}`
+            })
+        }
+    }
+
+    // @route [PUT] /account/edit-profile
+    // @desc edit profile in setting
+    // @access Private
+    async editProfile(req, res) {
+        const user_id = req.user_id
+        const { bio, real_name, location, flag } = req.body
+
+        try {
+            const [updatedProfile] = await Profile.update(
+                { bio, real_name, location, flag },
+                { where: { user_id } }
+            )
+
+            // check update
+            if (updatedProfile === 0) {
+                return res.status(400).json({ success: false, message: 'User not found or no changes made' })
+            }
+
+            return res.status(200).json({ success: true, message: 'Profile updated successfully' })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in editProfile: ${error.message}`
+            })
+        }
+    }
+
     // @route POST /account/change-username
     // @desc change username in setting
     // @access Private
