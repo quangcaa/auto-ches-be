@@ -24,24 +24,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      first_name: {
-        type: Sequelize.STRING
-      },
-      last_name: {
-        type: Sequelize.STRING
-      },
-      profile_picture: {
-        type: Sequelize.STRING
-      },
-      bio: {
-        type: Sequelize.TEXT
-      },
-      dob: {
-        type: Sequelize.DATEONLY
-      },
-      country: {
-        type: Sequelize.STRING
-      },
       joined_date: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
@@ -49,21 +31,15 @@ module.exports = {
       last_login: {
         type: Sequelize.DATE
       },
-      games: {
-        type: Sequelize.INTEGER
-      },
-      puzzles: {
-        type: Sequelize.INTEGER
+      is_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       verification_code: {
         type: Sequelize.STRING
       },
       verification_code_expires_at: {
         type: Sequelize.DATE
-      },
-      is_verified: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
       },
       refresh_token: {
         type: Sequelize.STRING
