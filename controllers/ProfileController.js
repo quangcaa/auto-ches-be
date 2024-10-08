@@ -1,4 +1,4 @@
-const { sequelize, User, Friendship, Game } = require('../db/models')
+const { sequelize, User, Follow, Game } = require('../db/models')
 
 class ProfileController {
     // @route GET /@/:username
@@ -129,6 +129,23 @@ class ProfileController {
         const { username } = req.params
 
         try {
+            const user = await User.findOne({ where: { username } })
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // fetch follow list
+            const fetchFollowQuery = `
+                SELECT * 
+                FROM follows
+                WHERE 
+                                        `
+            const followingList = await Follow.findAll({
+                where: {
+                    
+                }
+            })
+
         } catch (error) {
             return res.status(400).json({
                 success: false,
