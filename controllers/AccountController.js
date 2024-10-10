@@ -1,10 +1,8 @@
 const bcryptjs = require('bcryptjs')
-const crypto = require('crypto')
 
 const { sequelize, User, Profile } = require('../db/models')
 const { Op } = require('sequelize')
 const { check } = require('express-validator')
-const { profile } = require('console')
 
 class AccountController {
     // @route [GET] /account/my-profile
@@ -55,44 +53,7 @@ class AccountController {
         }
     }
 
-    // @route POST /account/change-username
-    // @desc change username in setting
-    // @access Private
-    async changeUsername(req, res) {
-        const user_id = req.user_id
-        const { new_username } = req.body
-
-        try {
-            const user = await User.findByPk(user_id)
-            if (!user) {
-                return res.status(400).json({ success: false, message: 'User not found' })
-            }
-
-            // check if username exists
-            const checkUsernameExists = await User.findOne({ where: { username: new_username } })
-            if (checkUsernameExists) {
-                return res.status(400).json({ success: false, message: 'Username already exists' })
-            }
-
-            // check if username still not change
-            if (user.username === new_username) {
-                return res.status(400).json({ success: false, message: 'Choose other username' })
-            }
-
-            // update username 
-            user.username = new_username
-            await user.save()
-
-            return res.status(200).json({ success: false, message: 'Username changed successfully', username: user.username })
-        } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: `Error in changeUsername: ${error.message}`
-            })
-        }
-    }
-
-    // @route POST /account/change-password
+    // @route [PATCH] /account/change-password
     // @desc change password in setting
     // @access Private
     async changePassword(req, res) {
@@ -130,50 +91,7 @@ class AccountController {
         }
     }
 
-    // @route POST /account/change-email
-    // @desc change email in setting
-    // @access Private
-    async changeEmail(req, res) {
-        const user_id = req.user_id
-        const { current_password, new_email } = req.body
-
-        try {
-            const user = await User.findByPk(user_id)
-            if (!user) {
-                return res.status(400).json({ success: false, message: 'User not found' })
-            }
-
-            // check current_password
-            const isCurrentPasswordValid = bcryptjs.compareSync(current_password, user.password)
-            if (!isCurrentPasswordValid) {
-                return res.status(400).json({ success: false, message: 'Current password is wrong' })
-            }
-
-            // check new_email
-            const checkEmailExists = await User.findOne({ where: { email: new_email } })
-            if (checkEmailExists) {
-                return res.status(400).json({ success: false, message: 'Email already exists' })
-            }
-
-            // check if email still not change
-            if (user.email === new_email) {
-                return res.status(400).json({ success: false, message: 'Choose other email' })
-            }
-
-            // update new email
-            user.email = new_email
-            await user.save()
-
-            return res.status(200).json({ success: false, message: 'Email changed successfully', email: new_email })
-        } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: `Error in changeEmail: ${error.message}`
-            })
-        }
-    }
-
-    // @route POST /account/close-account
+    // @route [DELETE] /account/close-account
     // @desc close account permanent
     // @access Private
     async closeAccount(req, res) {
