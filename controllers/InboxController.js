@@ -55,9 +55,14 @@ class InboxController {
                     }
                 ],
                 where: {
-                    [Op.or]: [
-                        { sender_id: my_id },
-                        { receiver_id: my_id }
+                    [Op.and]: [
+                        {
+                            [Op.or]: [
+                                { sender_id: my_id },
+                                { receiver_id: my_id }
+                            ]
+                        },
+                        { game_id: null }
                     ]
                 },
                 group: ['user_id', 'user_name'],
@@ -77,7 +82,7 @@ class InboxController {
     }
 
     // @route GET /inbox/messages/:userId
-    // @desc Get all messages between the current user and another user
+    // @desc Get messages between the current user and other user
     // @access Private
     async getInboxMessage(req, res) {
         const my_id = req.user_id;
@@ -86,9 +91,14 @@ class InboxController {
         try {
             const messages = await Chat.findAll({
                 where: {
-                    [Op.or]: [
-                        { sender_id: my_id, receiver_id: other_user_id },
-                        { sender_id: other_user_id, receiver_id: my_id }
+                    [Op.and]: [
+                        {
+                            [Op.or]: [
+                                { sender_id: my_id, receiver_id: other_user_id },
+                                { sender_id: other_user_id, receiver_id: my_id }
+                            ]
+                        },
+                        { game_id: null }
                     ]
                 },
                 attributes: { 
