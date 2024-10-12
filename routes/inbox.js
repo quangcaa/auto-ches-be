@@ -6,5 +6,6 @@ const isAuth = require('../middlewares/isAuth')
 
 router.get('/', InboxController.getAllInbox)
 router.get('/messages/:userId', InboxController.getInboxMessage)
+router.delete('/delete-inbox/:userId', InboxController.deleteInbox)
 
 module.exports = router

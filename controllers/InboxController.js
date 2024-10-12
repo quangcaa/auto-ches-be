@@ -119,5 +119,47 @@ class InboxController {
             });
         }
     }
+
+    // @route DELETE /inbox/delete-inbox/:userId
+    // @desc Delete an inbox
+    // @access Private
+    async deleteInbox(req, res) {
+        const my_id = 1;
+        // req.user_id;
+        const other_user_id = req.params.userId;
+    
+        try {
+            const deletedCount = await Chat.destroy({
+                where: {
+                    [Op.and]: [
+                        {
+                            [Op.or]: [
+                                { sender_id: my_id, receiver_id: other_user_id },
+                                { sender_id: other_user_id, receiver_id: my_id }
+                            ]
+                        },
+                        { game_id: null }
+                    ]
+                }
+            });
+    
+            if (deletedCount === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'No chats found to delete'
+                });
+            }
+    
+            return res.status(200).json({
+                success: true,
+                message: 'Inbox deleted successfully'
+            });
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in deleteInbox: ${error.message}`
+            });
+        }
+    }    
 }
 module.exports = new InboxController();
