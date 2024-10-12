@@ -75,5 +75,39 @@ class InboxController {
             });
         }
     }
+
+    // @route GET /inbox/messages/:userId
+    // @desc Get all messages between the current user and another user
+    // @access Private
+    async getInboxMessage(req, res) {
+        const my_id = req.user_id;
+        const other_user_id = req.params.userId;
+
+        try {
+            const messages = await Chat.findAll({
+                where: {
+                    [Op.or]: [
+                        { sender_id: my_id, receiver_id: other_user_id },
+                        { sender_id: other_user_id, receiver_id: my_id }
+                    ]
+                },
+                attributes: { 
+                    exclude: ['game_id', 'chat_id'] 
+                },
+                order: [['time', 'ASC']],
+                raw: true
+            });
+
+            return res.status(200).json({
+                success: true,
+                data: messages
+            });
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in getConversation: ${error.message}`
+            });
+        }
+    }
 }
 module.exports = new InboxController();
