@@ -43,6 +43,9 @@ module.exports = {
       },
       refresh_token: {
         type: Sequelize.STRING
+      },
+      online: {
+        type: Sequelize.BOOLEAN
       }
     });
   },

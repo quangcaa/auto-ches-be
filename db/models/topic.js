@@ -28,8 +28,9 @@ module.exports = (sequelize, DataTypes) => {
   Topic.init({
     topic_id: {
       allowNull: false,
+      autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.STRING
+      type: DataTypes.INTEGER
     },
     category_id: {
       type: DataTypes.STRING,
