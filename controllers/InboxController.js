@@ -81,7 +81,7 @@ class InboxController {
         }
     }
 
-    // @route GET /inbox/messages/:userId
+    // @route GET /inbox/:userId
     // @desc Get messages between the current user and other user
     // @access Private
     async getInboxMessage(req, res) {
