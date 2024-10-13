@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
     reset_password_expires_at: {
       type: DataTypes.DATE
     },
-    createdAt: {
+    created_at: {
       allowNull: false,
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

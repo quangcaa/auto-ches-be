@@ -101,7 +101,7 @@ module.exports = (sequelize, DataTypes) => {
     move_number: {
       type: DataTypes.INTEGER,
     },
-    createdAt: {
+    created_at: {
       allowNull: false,
       type: DataTypes.DATE,
     },

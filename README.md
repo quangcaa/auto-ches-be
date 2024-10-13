@@ -7,3 +7,4 @@ PROJECT - Phát triển ứng dụng Web (INT3306 8) - UET
 
 ### sequelize
 - npx sequelize-cli db:migrate
+- npx sequelize-cli db:seed:all 
