@@ -1,5 +1,6 @@
 const { sequelize, Chat, User } = require('../db/models');
 const { Op } = require('sequelize');
+const { io, getSocketIdByUserId } = require('../socket/socket.js');
 
 class InboxController {
     // @route GET /inbox
@@ -160,6 +161,48 @@ class InboxController {
                 message: `Error in deleteInbox: ${error.message}`
             });
         }
-    }    
+    }
+    
+    // @route POST /inbox/send-message/:userId
+    // @desc Send message from the current user to another user
+    // @access Private
+    async sendMessage(req, res) {
+        // const my_id = req.user_id;
+        const my_id = 1
+        const other_user_id = req.params.userId;
+        const { message } = req.body;
+
+        if (!message || message.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Message content cannot be empty'
+            });
+        }
+
+        try {
+            const otherUserSocketId = await getSocketIdByUserId(other_user_id);
+            if (otherUserSocketId) {
+                io.to(otherUserSocketId).emit('newMessage', message);
+            }
+            
+            const newMessage = await Chat.create({
+                sender_id: my_id,
+                receiver_id: other_user_id,
+                message: message,
+                time: new Date(),
+                game_id: null
+            });
+
+            return res.status(201).json({
+                success: true,
+                data: newMessage
+            });
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in sendMessage: ${error.message}`
+            });
+        }
+    }
 }
 module.exports = new InboxController();
