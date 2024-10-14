@@ -1,6 +1,7 @@
 const { Server } = require('socket.io');
 const http = require('http');
 const express = require('express');
+const { handleSendMessage } = require('./events/sendInboxMessage');
 
 require('dotenv').config();
 
@@ -27,6 +28,14 @@ io.on('connection', (socket) => {
         userSocketMap[userId] = socket.id;
         io.emit('getOnlineUsers', Object.keys(userSocketMap));
     }
+
+    socket.on('sendMessage', async (data) => {
+        await handleSendMessage(io, userSocketMap, userId, data);
+    });
+
+    socket.on('sendMatchMessage', async (data) => {
+        await handleSendMatchMessage(io, userSocketMap, userId, data);
+    });
 
     socket.on('disconnect', () => {
         delete userSocketMap[userId];
