@@ -12,7 +12,7 @@ const { generateToken, decodeToken } = require('../utils/authen')
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../mailtrap/email')
 
 class AuthController {
-    // @route POST /auth/signup
+    // @route [POST] /auth/signup
     // @desc Sign up an account
     // @access Public
     async signup(req, res) {
@@ -50,7 +50,7 @@ class AuthController {
 
             // create user profile
             const profile = await Profile.create({
-                user_id : user.toJSON().user_id
+                user_id: user.toJSON().user_id
             })
 
             // generate access token
@@ -208,7 +208,7 @@ class AuthController {
                 refreshToken = user.refresh_token
             }
 
-            return res.status(200).json({ success: true, message: 'Logged in successfully', accessToken })
+            return res.status(200).json({ success: true, message: 'Logged in successfully', accessToken, username })
         } catch (error) {
             return res.status(400).json({
                 success: false,
