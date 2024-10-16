@@ -1,10 +1,10 @@
+const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
-const express = require('express')
 const cookieParser = require('cookie-parser')
-const {app, server} = require("./socket/socket.js")
 
 const route = require('./routes/index')
+const {app, server} = require("./socket/socket.js")
 
 dotenv.config()
 

@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER
     },
     topic_id: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       references: {
         model: 'topics',
         key: 'topic_id'
@@ -53,9 +53,10 @@ module.exports = (sequelize, DataTypes) => {
     content: {
       type: DataTypes.TEXT
     },
-    createdAt: {
+    created_at: {
       allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
     },
   }, {
     sequelize,

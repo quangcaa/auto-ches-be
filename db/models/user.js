@@ -51,6 +51,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     refresh_token: {
       type: DataTypes.STRING
+    },
+    online: {
+      type: DataTypes.BOOLEAN
     }
   }, {
     sequelize,

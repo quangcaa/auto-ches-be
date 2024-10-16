@@ -10,7 +10,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       topic_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         references: {
           model: 'topics',
           key: 'topic_id'
@@ -30,9 +30,10 @@ module.exports = {
       content: {
         type: Sequelize.TEXT
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
       },
     });
   },
