@@ -4,10 +4,9 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 
 const route = require('./routes/index')
+const {app, server} = require("./socket/socket.js")
 
 dotenv.config()
-
-const app = express()
 
 const PORT = process.env.PORT
 const NODE_ENV = process.env.NODE_ENV
@@ -19,6 +18,6 @@ app.use(cookieParser()) // allow parse cookies
 
 route(app) // routes init
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running in ${NODE_ENV} mode on port ${PORT}`)
 })
