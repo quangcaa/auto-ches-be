@@ -52,25 +52,24 @@ module.exports = {
       },
       start_time: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
       },
       end_time: {
         type: Sequelize.DATE
       },
       result: {
-        type: Sequelize.ENUM,
-        values: ['white_win', 'black_win', 'draw', 'abandoned']
+        type: Sequelize.STRING,
       },
-      pgn: {
-        type: Sequelize.TEXT
+      status: {
+        type: Sequelize.STRING,
       },
-      move_number: {
-        type: Sequelize.INTEGER
+      starting_fen: {
+        type: Sequelize.STRING,
+        defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       },
-      created_at: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
+      current_fen: {
+        type: Sequelize.STRING
       },
     });
   },

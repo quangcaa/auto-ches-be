@@ -88,22 +88,24 @@ module.exports = (sequelize, DataTypes) => {
     start_time: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: DataTypes.NOW,
+
     },
     end_time: {
       type: DataTypes.DATE,
     },
     result: {
-      type: DataTypes.ENUM('white_win', 'black_win', 'draw', 'abandoned'),
+      type: DataTypes.STRING
     },
-    pgn: {
-      type: DataTypes.TEXT,
+    status: {
+      type: DataTypes.STRING,
     },
-    move_number: {
-      type: DataTypes.INTEGER,
+    starting_fen: {
+      type: DataTypes.STRING,
+      defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     },
-    created_at: {
-      allowNull: false,
-      type: DataTypes.DATE,
+    current_fen: {
+      type: DataTypes.STRING
     },
   }, {
     sequelize,
