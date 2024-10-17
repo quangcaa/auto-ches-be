@@ -208,7 +208,13 @@ class AuthController {
                 refreshToken = user.refresh_token
             }
 
-            return res.status(200).json({ success: true, message: 'Logged in successfully', accessToken, username })
+            return res.status(200).json({
+                success: true,
+                message: 'Logged in successfully',
+                accessToken,
+                user_id: user.user_id,
+                username: user.username
+            })
         } catch (error) {
             return res.status(400).json({
                 success: false,
