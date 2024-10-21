@@ -39,9 +39,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Game.init({
     game_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
-      autoIncrement: true,
       primaryKey: true,
     },
     variant_id: {
@@ -105,7 +104,8 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     },
     current_fen: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     },
   }, {
     sequelize,

@@ -5,9 +5,8 @@ module.exports = {
     await queryInterface.createTable('games', {
       game_id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       variant_id: {
         type: Sequelize.STRING,
@@ -69,7 +68,8 @@ module.exports = {
         defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       },
       current_fen: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       },
     });
   },

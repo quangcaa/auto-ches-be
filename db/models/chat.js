@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
     },
     game_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       references: {
         model: 'games',
         key: 'game_id'
