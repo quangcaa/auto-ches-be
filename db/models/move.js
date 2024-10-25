@@ -35,14 +35,30 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
+    from: {
+      type: DataTypes.STRING
+    },
+    to: {
+      type: DataTypes.STRING
+    },
+    comments: {
+      type: DataTypes.STRING
+    },
+    before: {
+      type: DataTypes.STRING
+    },
+    after: {
+      type: DataTypes.STRING
+    },
     move_number: {
       type: DataTypes.INTEGER
     },
-    move_text: {
+    san: {
       type: DataTypes.STRING
     },
-    player_color: {
-      type: DataTypes.STRING
+    time_taken: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     created_at: {
       allowNull: false,
