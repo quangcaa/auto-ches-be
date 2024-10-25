@@ -23,7 +23,7 @@ export class GameManager {
         this.users.push(user)
         this.addHandler(user)
 
-        console.log(this.users)
+        console.log('ran into GameManager/addUser')
     }
 
     // xoa user khoi phong
@@ -74,7 +74,7 @@ export class GameManager {
                     await game?.updateSecondPlayer(user.user_id)
                     this.pendingGameId = null
                 } else {
-                    const game = new Game(user.user_id, "")
+                    const game = new Game(user.user_id, null)
                     this.games.push(game)
                     this.pendingGameId = game.game_id
 

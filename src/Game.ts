@@ -43,8 +43,8 @@ export function isPromoting(chess: Chess, from: Square, to: Square) {
 // game class
 export class Game {
     public game_id: string
-    public player1: string
-    public player2: string
+    public player1: number
+    public player2: number | null
     public board: Chess
     public result: GAME_RESULT | null = null
     private moveCount = 0
@@ -55,9 +55,9 @@ export class Game {
     private player1TimeConsumed = 0
     private player2TimeConsumed = 0
 
-    constructor(player1: string, player2: string, game_id?: string, startTime?: Date) {
+    constructor(player1: number, player2: number | null, game_id?: string, startTime?: Date) {
         this.player1 = player1
-        this.player2 = player2
+        this.player2 = player2 
         this.board = new Chess()
         this.game_id = game_id ?? randomUUID()
         if (startTime) {
@@ -80,7 +80,7 @@ export class Game {
     }
 
 
-    async updateSecondPlayer(player2: string) {
+    async updateSecondPlayer(player2: number) {
         this.player2 = player2
 
         const users = await DbUser.findAll({
@@ -99,8 +99,8 @@ export class Game {
             return
         }
 
-        const WhitePlayer = users.find((user: { user_id: string }) => user.user_id === this.player1)
-        const BlackPlayer = users.find((user: { user_id: string }) => user.user_id === this.player2)
+        const WhitePlayer = users.find((user: { user_id: number }) => user.user_id === this.player1)
+        const BlackPlayer = users.find((user: { user_id: number }) => user.user_id === this.player2)
 
         socketManager.broadcast(
             this.game_id,

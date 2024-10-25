@@ -12,10 +12,10 @@ const { generateToken, decodeToken } = require('../utils/authen')
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../mailtrap/email')
 
 class AuthController {
-    // @route [POST] /auth/signup
+    // @route [POST] /auth/register
     // @desc Sign up an account
     // @access Public
-    async signup(req, res) {
+    async register(req, res) {
         const { username, email, password } = req.body
 
         try {
@@ -92,6 +92,7 @@ class AuthController {
                 message: 'User created successfully',
                 user: userObj,
                 accessToken,
+                refreshToken
             })
 
         } catch (error) {
@@ -212,8 +213,10 @@ class AuthController {
                 success: true,
                 message: 'Logged in successfully',
                 accessToken,
-                user_id: user.user_id,
-                username: user.username
+                user: {
+                    user_id: user.user_id,
+                    username: user.username
+                }
             })
         } catch (error) {
             return res.status(400).json({
@@ -346,7 +349,7 @@ class AuthController {
             })
 
             // send email
-            await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}:${process.env.PORT}/reset-password/${resetToken}`)
+            // await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}:${process.env.PORT}/reset-password/${resetToken}`)
 
             return res.status(200).json({ success: true, message: 'Password reset link sent to your email' })
         } catch (error) {
