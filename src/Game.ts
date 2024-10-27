@@ -57,7 +57,7 @@ export class Game {
 
     constructor(player1: number, player2: number | null, game_id?: string, startTime?: Date) {
         this.player1 = player1
-        this.player2 = player2 
+        this.player2 = player2
         this.board = new Chess()
         this.game_id = game_id ?? randomUUID()
         if (startTime) {
@@ -83,12 +83,11 @@ export class Game {
     async updateSecondPlayer(player2: number) {
         this.player2 = player2
 
+        console.log('ran into Game/updateSecondPlayer')
+
         const users = await DbUser.findAll({
             where: {
-                [Op.in]: [
-                    this.player1,
-                    this.player2 ?? ''
-                ]
+                user_id: [this.player1, this.player2 ?? '']
             }
         })
 

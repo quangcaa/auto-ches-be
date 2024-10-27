@@ -42,8 +42,12 @@ export class GameManager {
     }
 
     private addHandler(user: User) {
+        console.log("ran into GameManager/addHandler")
+
         user.socket.on('message', async (data) => {
             const message = JSON.parse(data.toString())
+
+            console.log(message)
 
             if (message.type === INIT_GAME) {
                 //  if game is pending
@@ -73,10 +77,14 @@ export class GameManager {
                     socketManager.addUser(user, game.game_id)
                     await game?.updateSecondPlayer(user.user_id)
                     this.pendingGameId = null
+
+                    console.log(`INIT_GAME If this.pendingGAmeId: ${this.games}`)
                 } else {
                     const game = new Game(user.user_id, null)
                     this.games.push(game)
                     this.pendingGameId = game.game_id
+
+                    console.log(this.games)
 
                     socketManager.addUser(user, game.game_id)
                     socketManager.broadcast(
@@ -93,8 +101,10 @@ export class GameManager {
                 const game_id = message.payload.game_id
                 const game = this.games.find(game => game.game_id === game_id)
 
+                console.log(`MOVE IN GAME: ${message.payload.move}`)
+
                 if (game) {
-                    game.makeMove(user, message.payload.move)
+                    game.makeMove(user, message.move)
                     if (game.result) {
                         this.removeGame(game.game_id)
                     }
