@@ -213,9 +213,10 @@ class AuthController {
                 success: true,
                 message: 'Logged in successfully',
                 accessToken,
+                refreshToken,
                 user: {
                     user_id: user.user_id,
-                    username: user.username
+                    username: user.username,
                 }
             })
         } catch (error) {

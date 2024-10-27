@@ -48,6 +48,7 @@ class SocketManager {
     }
 
     users.forEach((user) => {
+      console.log(`broadcast send !: ${message}`)
       user.socket.send(message)
     })
   }
