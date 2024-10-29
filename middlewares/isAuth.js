@@ -20,7 +20,7 @@ const isAuth = async (req, res, next) => {
         accessTokenSecret
     )
     if (!verified) {
-        return res.status(400).json({ success: false, message: 'Invalid access token - You do not have access to this feature' })
+        return res.status(401).json({ success: false, message: 'Invalid access token - You do not have access to this feature' })
     }
 
     // get user data

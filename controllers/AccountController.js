@@ -98,6 +98,8 @@ class AccountController {
         const user_id = req.user_id
         const { password } = req.body
 
+        console.log('closeAccount called with user_id:', user_id, 'and password:', password);
+
         try {
             const user = await User.findByPk(user_id)
             if (!user) {
@@ -113,7 +115,7 @@ class AccountController {
             // delete the account
             await User.destroy({ where: { user_id } })
 
-            return res.status(200).json({ success: false, message: 'Account deleted :(' })
+            return res.status(200).json({ success: true, message: 'Account deleted :(' })
         } catch (error) {
             return res.status(400).json({
                 success: false,
