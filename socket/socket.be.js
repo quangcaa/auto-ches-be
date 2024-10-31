@@ -1,9 +1,11 @@
 const { Server } = require('socket.io')
+const { GameManager } = require('./GameManager')
 
 let io
 
 const connected_users = new Map() // online users
 const rooms = {} // store online rooms
+const gameManager = new GameManager()
 
 const initSocket = (httpServer) => {
     // create connect
@@ -26,30 +28,41 @@ const initSocket = (httpServer) => {
 
     // event
     io.on('connection', (socket) => {
-        console.log(`[SOCKET]: User [${socket.user_id}] connected with socket id: [${socket.id}].`)
         connected_users.set(socket.user_id, socket.id)
+        console.log(`[SOCKET]: User [${socket.user_id}] connected with socket id: [${socket.id}].`)
         console.log(connected_users)
 
         // create a room
-        socket.on('create_room', (callback) => {
-            const room_id = nanoid()
-            rooms[room_id] = { players: [socket.id] }
-            socket.join(room_id)
-            socket.emit('room_created', room_id)
-            console.log(`Room ${room_id} created`)
-            callback(room_id)
+        socket.on('create_room', async (callback) => {
+            // const { nanoid } = await import('nanoid')
+            // const room_id = nanoid()
+
+            // rooms[room_id] = { players: [socket.id], white: socket.id, black: null, turn: 'w' }
+            // socket.join(room_id)
+            // socket.emit('room_created', room_id)
+            // console.log(`Room ${room_id} created`)
+            // console.log(`${rooms[room_id].white}`)
+            // console.log(`${rooms[room_id].black}`)
+            const game_id = await gameManager.createGame(socket)
+
+            callback(game_id)
         })
 
         // join a room
         socket.on('join_room', (room_id) => {
-            if (rooms[room_id]) {
-                rooms[room_id].players.push(socket.id)
-                socket.join(room_id)
-                io.to(room_id).emit('start_game', { players: rooms[room_id].players })
-                console.log(`User joined room ${room_id}`)
-            } else {
-                socket.emit('error', 'Room not found')
-            }
+            // if (rooms[room_id]) {
+            //     rooms[room_id].players.push(socket.id)
+            //     rooms[room_id].black = socket.id
+            //     socket.join(room_id)
+            //     io.to(room_id).emit('start_game', { players: rooms[room_id].players })
+            //     console.log(`User joined room ${room_id}`)
+            //     console.log(`User joined room ${rooms[room_id].white}`)
+            //     console.log(`User joined room ${rooms[room_id].black}`)
+            // } else {
+            //     socket.emit('error', 'Room not found')
+            // }
+
+            gameManager.joinGame(socket, room_id, io)
         })
 
         // leave room
@@ -60,6 +73,20 @@ const initSocket = (httpServer) => {
 
         // move a piece
         socket.on('move', ({ room_id, move }) => {
+            // const room = rooms[room_id]
+            // if (!room) console.log('not foundg room')
+
+            // if ((room.turn === 'w' && room.white === socket.id) ||
+            //     (room.turn === 'b' && room.black === socket.id)) {
+
+            //     socket.to(room_id).emit('move', move)
+
+            //     room.turn = room.turn === 'w' ? 'b' : 'w'
+            // } else {
+            //     socket.emit('error', 'not your turn')
+            //     console.log('nbot your turn')
+            // }
+
             socket.to(room_id).emit('move', move)
         })
 
@@ -85,11 +112,11 @@ const initSocket = (httpServer) => {
 
 const getIO = () => {
     if (!io) {
-        throw new Error('Socket not initialized')
+        throw new Error('Socket not initialized');
     }
 
-    return io
-}
+    return io;
+};
 
 const getConnectedUsers = () => connected_users
 
