@@ -103,7 +103,7 @@ class AuthController {
         }
     }
 
-    // @route POST /auth/verify-email
+    // @route [POST] /auth/verify-email
     // @desc Verify email to create account
     // @access Private
     async verifyEmail(req, res) {
@@ -145,7 +145,7 @@ class AuthController {
         }
     }
 
-    // @route POST /auth/login
+    // @route [POST] /auth/login
     // @desc Log in to play chess
     // @access Public
     async login(req, res) {
@@ -227,7 +227,7 @@ class AuthController {
         }
     }
 
-    // @route POST /auth/refresh
+    // @route [POST] /auth/refresh
     // @desc generate new access-token when expired
     // @access Private
     async refreshToken(req, res) {
@@ -286,7 +286,7 @@ class AuthController {
         }
     }
 
-    // @route POST /auth/logout
+    // @route [POST] /auth/logout
     // @desc Log out account
     // @access Private
     async logout(req, res) {
@@ -326,7 +326,7 @@ class AuthController {
         }
     }
 
-    // @route POST /auth/forgot-password
+    // @route [POST] /auth/forgot-password
     // @desc Send reset password link to email
     // @access Public
     async forgotPassword(req, res) {
@@ -361,7 +361,7 @@ class AuthController {
         }
     }
 
-    // @route POST /auth/reset-password/:token
+    // @route [POST] /auth/reset-password/:token
     // @desc reset old password, create new one 
     // @access Public
     async resetPassword(req, res) {

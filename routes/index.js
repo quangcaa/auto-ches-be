@@ -5,6 +5,7 @@ const puzzleRouter = require('./puzzle')
 const forumRouter = require('./forum')
 const profileRouter = require('./profile')
 const relationRouter = require('./relation')
+const searchRouter = require('./search')
 
 const route = (app) => {
     app.use('/auth', authRouter)
@@ -14,6 +15,7 @@ const route = (app) => {
     app.use('/inbox', inboxRouter)
     app.use('/puzzle', puzzleRouter)
     app.use('/forum', forumRouter)
+    app.use('/search', searchRouter)
 }
 
 module.exports = route

@@ -34,15 +34,6 @@ const initSocket = (httpServer) => {
 
         // create a room
         socket.on('create_room', async (callback) => {
-            // const { nanoid } = await import('nanoid')
-            // const room_id = nanoid()
-
-            // rooms[room_id] = { players: [socket.id], white: socket.id, black: null, turn: 'w' }
-            // socket.join(room_id)
-            // socket.emit('room_created', room_id)
-            // console.log(`Room ${room_id} created`)
-            // console.log(`${rooms[room_id].white}`)
-            // console.log(`${rooms[room_id].black}`)
             const game_id = await gameManager.createGame(socket)
 
             callback(game_id)
@@ -87,7 +78,9 @@ const initSocket = (httpServer) => {
             //     console.log('nbot your turn')
             // }
 
-            socket.to(room_id).emit('move', move)
+            // socket.to(room_id).emit('move', move)
+            gameManager.gameMove(room_id, move, socket)
+
         })
 
         socket.on('disconnect', () => {

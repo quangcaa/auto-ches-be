@@ -7,8 +7,8 @@ class GameManager {
 
     async createGame(socket) {
         const { nanoid } = await import('nanoid')
-
         const game_id = nanoid();
+
         const game = new Game(socket.user_id, null, game_id);
         this.games.set(game_id, game);
 
@@ -31,9 +31,11 @@ class GameManager {
         }
     }
 
-    gameMove(game_id, move) {
+    gameMove(game_id, move, socket) {
         const game = this.games.get(game_id)
-        
+        console.log(`[gameMove]: game ${game}`)
+
+        game.makeMove(socket, move)
     }
 
     deleteGame(game_id) {
