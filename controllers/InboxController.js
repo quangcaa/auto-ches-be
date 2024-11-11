@@ -1,6 +1,6 @@
 const { sequelize, Chat, User } = require('../db/models');
 const { Op } = require('sequelize');
-const { io, getSocketIdByUserId } = require('../socket/socket.js');
+// const { io, getSocketIdByUserId } = require('../socket/socket.js');
 
 class InboxController {
     // @route GET /inbox
