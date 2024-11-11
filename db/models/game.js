@@ -35,6 +35,12 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
+      Game.hasMany(models.Move, { 
+        as: 'moves', 
+        foreignKey: 'game_id',
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      });
     }
   }
   Game.init({

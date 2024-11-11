@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Move.belongsTo(models.Game, { 
-        as: 'move_game_id_fk', 
+        as: 'game', 
         foreignKey: 'game_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
