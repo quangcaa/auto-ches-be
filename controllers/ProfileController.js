@@ -51,6 +51,33 @@ class ProfileController {
     }
 
 
+    // @route [GET] /@/:user_id/public
+    // @desc get user public data (for GameInfo component)
+    // @access Private
+    async getUserPublic(req, res) {
+        const { user_id } = req.params
+        const current_user_id = req.user_id
+
+        try {
+            // fetch user public data
+            const userData = await User.findByPk(user_id,
+                { attributes: ['user_id', 'username'] }
+            )
+
+            if (!userData) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            return res.status(200).json({ success: true, user: userData })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in getUserPublic: ${error.message}`
+            })
+        }
+    }
+
+
     // @route [GET] /@/:username/following
     // @desc get all user's following
     // @access Private

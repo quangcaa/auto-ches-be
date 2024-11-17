@@ -1,6 +1,6 @@
 const { Chess } = require('chess.js')
 const { sequelize, Game: DbGame, Move: DbMove, User: DbUser } = require('../db/models')
-const { PLAYER_EXIT, BLACK_WINS, WHITE_WINS, COMPLETED, GAME_OVER, MOVE, DRAW } = require('./message')
+const { PLAYER_EXIT, BLACK_WINS, WHITE_WINS, COMPLETED, GAME_OVER, MOVE, DRAW, RECEIVE_MESSAGE } = require('./message')
 
 
 class Game {
@@ -15,8 +15,11 @@ class Game {
         this.moveTimer = null // dong ho move
         this.startTime = new Date(Date.now()) // thoi gian bat dau
         this.lastMoveTime = new Date(Date.now())
-        this.player1TimeConsumed = 0
-        this.player2TimeConsumed = 0
+        // this.player1TimeConsumed = 0
+        // this.player2TimeConsumed = 0
+
+        this.player1Time = 10 * 60 * 1000;
+        this.player2Time = 10 * 60 * 1000;
     }
 
     async addPlayer(player2) {
@@ -79,6 +82,10 @@ class Game {
 
             io.to(this.game_id).emit(GAME_OVER, result)
         }
+    }
+
+    sendMessage(socket, message, io) {
+        io.to(this.game_id).emit(RECEIVE_MESSAGE, message)
     }
 
     async createGameInDb() {
