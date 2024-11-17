@@ -6,7 +6,8 @@ const {
     MOVE,
     JOIN_GAME,
     LEAVE_GAME,
-    GAME_OVER
+    GAME_OVER,
+    SEND_MESSAGE
 } = require('./message')
 
 class GameManager {
@@ -59,6 +60,13 @@ class GameManager {
                 game.makeMove(socket, move, callback, io)
             } else {
                 callback({ success: false, message: 'Game not found.' })
+            }
+        })
+
+        socket.on(SEND_MESSAGE, ({ game_id, message }) => {
+            const game = this.games.get(game_id)
+            if (game) {
+                game.sendMessage(socket, message, io)
             }
         })
 

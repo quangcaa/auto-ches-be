@@ -62,12 +62,12 @@ class ForumController {
                     ORDER BY p2.created_at DESC
                     LIMIT 1
                 )
-                WHERE t.category_id = 'GCD'
+                WHERE t.category_id = ?
                 GROUP BY t.topic_id, t.subject, u.username
                 ORDER BY last_post_time DESC
                 `,
                 {
-                    replacement: [category_id],
+                    replacements: [category_id],
                     type: sequelize.QueryTypes.SELECT
                 }
             )
