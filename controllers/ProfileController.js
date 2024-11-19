@@ -113,6 +113,80 @@ class ProfileController {
             })
         }
     }
+
+
+    // @route [POST] /@/:username/report
+    // @desc report user
+    // @access Private
+    async reportUser(req, res) {
+        const { username } = req.params
+        const follower = req.user_id
+
+        try {
+            const user = await User.findOne({ where: { username } })
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // fetch following list
+            const followingList = await sequelize.query(
+                `  
+                SELECT f.following_id, u.username, u.online, u.last_login
+                FROM follows f
+                JOIN users u ON u.user_id = f.following_id
+                WHERE f.follower_id = ?
+                `,
+                {
+                    replacements: [follower],
+                    type: sequelize.QueryTypes.SELECT,
+                }
+            )
+
+            return res.status(200).json({ success: true, followingList })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in getAllFollowing: ${error.message}`
+            })
+        }
+    }
+
+
+    // @route [POST] /@/:username/challenge
+    // @desc challenge user to a game
+    // @access Private
+    async challengeUser(req, res) {
+        const { username } = req.params
+        const follower = req.user_id
+
+        try {
+            const user = await User.findOne({ where: { username } })
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // fetch following list
+            const followingList = await sequelize.query(
+                `  
+                SELECT f.following_id, u.username, u.online, u.last_login
+                FROM follows f
+                JOIN users u ON u.user_id = f.following_id
+                WHERE f.follower_id = ?
+                `,
+                {
+                    replacements: [follower],
+                    type: sequelize.QueryTypes.SELECT,
+                }
+            )
+
+            return res.status(200).json({ success: true, followingList })
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in getAllFollowing: ${error.message}`
+            })
+        }
+    }
 }
 
 module.exports = new ProfileController()
