@@ -11,32 +11,32 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Game.belongsTo(models.User, { 
-        as: 'game_white_player_id_fk', 
+      Game.belongsTo(models.User, {
+        as: 'game_white_player_id_fk',
         foreignKey: 'white_player_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
-      Game.belongsTo(models.User, { 
-        as: 'game_black_player_id_fk', 
+      Game.belongsTo(models.User, {
+        as: 'game_black_player_id_fk',
         foreignKey: 'black_player_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
-      Game.belongsTo(models.Variant, { 
-        as: 'game_variant_id_fk', 
+      Game.belongsTo(models.Variant, {
+        as: 'game_variant_id_fk',
         foreignKey: 'variant_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
-      Game.belongsTo(models.TimeControl, { 
-        as: 'game_time_control_id_fk', 
+      Game.belongsTo(models.TimeControl, {
+        as: 'game_time_control_id_fk',
         foreignKey: 'time_control_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
-      Game.hasMany(models.Move, { 
-        as: 'moves', 
+      Game.hasMany(models.Move, {
+        as: 'moves',
         foreignKey: 'game_id',
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
@@ -105,11 +105,7 @@ module.exports = (sequelize, DataTypes) => {
     status: {
       type: DataTypes.STRING,
     },
-    starting_fen: {
-      type: DataTypes.STRING,
-      defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-    },
-    current_fen: {
+    fen: {
       type: DataTypes.STRING,
       defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     },

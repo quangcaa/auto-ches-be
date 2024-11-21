@@ -1,14 +1,24 @@
 const { Server } = require('socket.io')
 const { GameManager } = require('./GameManager')
+const { handleSendMessage } = require('./InboxManager')
 
 let io
 
 const connected_users = new Map() // online users
 const gameManager = new GameManager()
 
+const {
+    SEND_INBOX_MESSAGE
+} = require('./message')
+
 const CLIENT_URL = process.env.CLIENT_URL
 
 const initSocket = (httpServer) => {
+    // if (io) {
+    //     console.log('Socket.io server already initialized.')
+    //     return;
+    // }
+
     io = new Server(httpServer, {
         connectionStateRecovery: {},
         cors: {
@@ -16,7 +26,7 @@ const initSocket = (httpServer) => {
             credentials: true,
         }
     })
-    
+
 
     io.use((socket, next) => {
         const user_id = socket.handshake.auth.user_id
@@ -30,6 +40,10 @@ const initSocket = (httpServer) => {
     io.on('connection', (socket) => {
         connected_users.set(socket.user_id, socket.id)
         console.log(`[SOCKET]: User [${socket.user_id}] connected with socket id: [${socket.id}].`)
+
+        socket.on(SEND_INBOX_MESSAGE, async (data) => {
+            await handleSendMessage(data, io, connected_users)
+        })
 
         gameManager.handleEvent(socket, io)
 

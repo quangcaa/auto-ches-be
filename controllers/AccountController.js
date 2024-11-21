@@ -98,8 +98,6 @@ class AccountController {
         const user_id = req.user_id
         const { password } = req.body
 
-        console.log('closeAccount called with user_id:', user_id, 'and password:', password);
-
         try {
             const user = await User.findByPk(user_id)
             if (!user) {

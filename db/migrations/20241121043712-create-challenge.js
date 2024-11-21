@@ -2,14 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('notifications', {
-      notification_id: {
+    await queryInterface.createTable('challenges', {
+      challenge_id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      user_id: {
+      sender_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
@@ -19,21 +19,34 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      type: {
+      receiver_id: {
         allowNull: false,
-        type: Sequelize.ENUM('follow', 'inbox', 'forum'),
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'user_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      content: {
+      game_id: {
         allowNull: false,
-        type: Sequelize.TEXT
+        type: Sequelize.STRING,
+        references: {
+          model: 'games',
+          key: 'game_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      status: {
+        type: Sequelize.ENUM('pending', 'accepted', 'declined', 'canceled'),
+        allowNull: false,
+        defaultValue: 'pending'
       },
       is_read: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
-      },
-      source_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
       },
       created_at: {
         allowNull: false,
@@ -42,6 +55,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('notifications');
+    await queryInterface.dropTable('challenges');
   }
 };

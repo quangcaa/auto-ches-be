@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 // const { io, getSocketIdByUserId } = require('../socket/socket.js');
 
 class InboxController {
-    // @route GET /inbox
+    // @route [GET] /inbox
     // @desc Get all inbox
     // @access Private
     async getAllInbox(req, res) {
@@ -82,8 +82,9 @@ class InboxController {
         }
     }
 
-    // @route GET /inbox/:userId
-    // @desc Get messages between the current user and other user
+
+    // @route [GET] /inbox/:userId
+    // @desc Get conversation
     // @access Private
     async getInboxMessage(req, res) {
         const my_id = req.user_id;
@@ -121,7 +122,7 @@ class InboxController {
         }
     }
 
-    // @route DELETE /inbox/delete-inbox/:userId
+    // @route [DELETE] /inbox/delete-inbox/:userId
     // @desc Delete an inbox
     // @access Private
     async deleteInbox(req, res) {
@@ -167,8 +168,7 @@ class InboxController {
     // @desc Send message from the current user to another user
     // @access Private
     async sendMessage(req, res) {
-        // const my_id = req.user_id;
-        const my_id = 1
+        const my_id = req.user_id;
         const other_user_id = req.params.userId;
         const { message } = req.body;
 
@@ -180,10 +180,10 @@ class InboxController {
         }
 
         try {
-            const otherUserSocketId = await getSocketIdByUserId(other_user_id);
-            if (otherUserSocketId) {
-                io.to(otherUserSocketId).emit('newMessage', message);
-            }
+            // const otherUserSocketId = await getSocketIdByUserId(other_user_id);
+            // if (otherUserSocketId) {
+            //     io.to(otherUserSocketId).emit('newMessage', message);
+            // }
             
             const newMessage = await Chat.create({
                 sender_id: my_id,

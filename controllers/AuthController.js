@@ -352,6 +352,8 @@ class AuthController {
             // send email
             // await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}:${process.env.PORT}/reset-password/${resetToken}`)
 
+            console.log(resetToken)
+
             return res.status(200).json({ success: true, message: 'Password reset link sent to your email' })
         } catch (error) {
             return res.status(400).json({

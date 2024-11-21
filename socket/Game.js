@@ -101,13 +101,14 @@ class Game {
             black_player_id: this.player2 ?? null,
             start_time: this.startTime,
             status: 'IN_PROGRESS',
-            starting_fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-            current_fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+            fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         })
     }
 
     async addMoveToDb(move, moveTimestamp) {
         const transaction = await sequelize.transaction()
+
+        console.log(move)
 
         try {
             await DbMove.create({

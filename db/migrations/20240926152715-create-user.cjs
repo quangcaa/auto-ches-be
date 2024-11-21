@@ -31,16 +31,6 @@ module.exports = {
       last_login: {
         type: Sequelize.DATE
       },
-      is_verified: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
-      verification_code: {
-        type: Sequelize.STRING
-      },
-      verification_code_expires_at: {
-        type: Sequelize.DATE
-      },
       refresh_token: {
         type: Sequelize.STRING
       },

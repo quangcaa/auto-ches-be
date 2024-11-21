@@ -10,8 +10,8 @@ module.exports = {
         category_description: 'The place to discuss general chess topics',
       },
       {
-        category_id:'LB',
-        category_name: 'Lichess Feedback',
+        category_id:'AF',
+        category_name: 'Autochess Feedback',
         category_description: 'Bug reports, feature requests, suggestions',
       },
       {

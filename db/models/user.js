@@ -39,16 +39,6 @@ module.exports = (sequelize, DataTypes) => {
     last_login: {
       type: DataTypes.DATE,
     },
-    is_verified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-    verification_code: {
-      type: DataTypes.STRING,
-    },
-    verification_code_expires_at: {
-      type: DataTypes.DATE,
-    },
     refresh_token: {
       type: DataTypes.STRING
     },

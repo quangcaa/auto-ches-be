@@ -20,12 +20,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     time_control_type: {
+      type: DataTypes.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical'),
+    },
+    initial: {
       type: DataTypes.STRING
     },
-    minutes_per_side: {
-      type: DataTypes.STRING
-    },
-    increment_in_seconds: {
+    increment: {
       type: DataTypes.STRING
     },
   }, {

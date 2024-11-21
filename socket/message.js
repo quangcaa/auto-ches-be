@@ -4,6 +4,7 @@ const LEAVE_GAME = 'leave_game'
 
 const GAME_CREATED = 'game_created'
 
+// game action
 const START_GAME = 'start_game'
 const MOVE = 'move'
 const GAME_OVER = 'game_over'
@@ -14,6 +15,11 @@ const DRAW_RESPONSE = 'draw_response'
 const SEND_MESSAGE = 'send_message'
 const RECEIVE_MESSAGE = 'receive_message'
 const NOTIFICATION_IN_GAME = 'notification_in_game'
+
+// inbox action
+const SEND_INBOX_MESSAGE = 'send_inbox_message'
+const RECEIVE_INBOX_MESSAGE = 'receive_inbox_message'
+
 
 const UPDATE_PLAYER_STATUS = 'update_player_status'
 const GET_ONLINE_PLAYERS = 'get_online_players'
