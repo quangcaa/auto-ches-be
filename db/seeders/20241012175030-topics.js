@@ -17,13 +17,13 @@ module.exports = {
         created_at: new Date()
       },
       {
-        category_id: 'LB',
+        category_id: 'AF',
         user_id: 1,
-        subject: 'Lichess Bug Report',
+        subject: 'Autochess Bug Report',
         created_at: new Date()
       },
       {
-        category_id: 'LB',
+        category_id: 'AF',
         user_id: 2,
         subject: 'Feature Request: Dark Mode',
         created_at: new Date()
@@ -59,9 +59,9 @@ module.exports = {
         created_at: new Date()
       },
       {
-        category_id: 'LB',
+        category_id: 'AF',
         user_id: 2,
-        subject: 'Lichess Feedback and Suggestions',
+        subject: 'Autochess Feedback and Suggestions',
         created_at: new Date()
       }
     ], {});

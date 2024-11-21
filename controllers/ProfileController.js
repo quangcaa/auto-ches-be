@@ -100,7 +100,7 @@ class ProfileController {
                 WHERE f.follower_id = ?
                 `,
                 {
-                    replacements: [follower],
+                    replacements: [user.user_id],
                     type: sequelize.QueryTypes.SELECT,
                 }
             )

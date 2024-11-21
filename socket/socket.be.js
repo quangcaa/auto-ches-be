@@ -14,6 +14,11 @@ const {
 const CLIENT_URL = process.env.CLIENT_URL
 
 const initSocket = (httpServer) => {
+    // if (io) {
+    //     console.log('Socket.io server already initialized.')
+    //     return;
+    // }
+
     io = new Server(httpServer, {
         connectionStateRecovery: {},
         cors: {

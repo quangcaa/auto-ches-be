@@ -9,15 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      game_id: {
-        type: Sequelize.STRING,
-        references: {
-          model: 'games',
-          key: 'game_id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
       sender_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
@@ -47,6 +38,8 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('chats', ['sender_id']);
+    await queryInterface.addIndex('chats', ['receiver_id']);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('chats');

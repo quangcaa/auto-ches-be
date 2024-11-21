@@ -11,8 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Notification.belongsTo(models.User, { 
-        as: 'notification_user_id_fk', 
+      Notification.belongsTo(models.User, {
+        as: 'notification_user_id_fk',
         foreignKey: 'user_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     },
     type: {
-      type: DataTypes.ENUM('friend-request', 'inbox', 'game-invitation', 'move-reminder'),
+      type: DataTypes.ENUM('follow', 'inbox', 'forum'),
       allowNull: false,
     },
     content: {
@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     is_read: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    source_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,

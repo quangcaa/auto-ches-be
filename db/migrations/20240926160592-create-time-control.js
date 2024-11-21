@@ -9,12 +9,12 @@ module.exports = {
         type: Sequelize.STRING
       },
       time_control_type: {
+        type: Sequelize.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical'),
+      },
+      initial: {
         type: Sequelize.STRING
       },
-      minutes_per_side: {
-        type: Sequelize.STRING
-      },
-      increment_in_seconds: {
+      increment: {
         type: Sequelize.STRING
       },
     });

@@ -63,11 +63,7 @@ module.exports = {
       status: {
         type: Sequelize.STRING,
       },
-      starting_fen: {
-        type: Sequelize.STRING,
-        defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-      },
-      current_fen: {
+      fen: {
         type: Sequelize.STRING,
         defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
       },

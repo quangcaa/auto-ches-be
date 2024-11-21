@@ -3,30 +3,39 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Chat extends Model {
+  class Challenge extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      Chat.belongsTo(models.User, {
+      Challenge.belongsTo(models.User, {
         as: 'Sender',
         foreignKey: 'sender_id',
-        onUpdate: 'CASCASE',
-        onDelete: 'CASCADE'
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       });
-      Chat.belongsTo(models.User, {
+
+      // Association to Receiver (User)
+      Challenge.belongsTo(models.User, {
         as: 'Receiver',
         foreignKey: 'receiver_id',
-        onUpdate: 'CASCASE',
-        onDelete: 'CASCADE'
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      });
+
+      // Association to Game
+      Challenge.belongsTo(models.Game, {
+        as: 'Game',
+        foreignKey: 'game_id',
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       });
     }
   }
-  Chat.init({
-    chat_id: {
+  Challenge.init({
+    challenge_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       autoIncrement: true,
@@ -52,19 +61,35 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    message: {
-      type: DataTypes.TEXT,
+    game_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'games',
+        key: 'game_id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
-    time: {
+    status: {
+      type: DataTypes.ENUM('pending', 'accepted', 'declined', 'canceled'),
+      allowNull: false,
+      defaultValue: 'pending'
+    },
+    is_read: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-    }
+      defaultValue: DataTypes.NOW,
+    },
   }, {
     sequelize,
-    modelName: 'Chat',
-    tableName: 'chats',
-    timestamps: false,
+    modelName: 'Challenge',
+    tableName: 'challenges',
+    timestamps: false
   });
-  return Chat;
+  return Challenge;
 };

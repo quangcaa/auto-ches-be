@@ -1,4 +1,4 @@
-const { Chat } = require('../../db/models')
+const { Chat } = require('../db/models')
 const { RECEIVE_INBOX_MESSAGE } = require('./message')
 
 const handleSendMessage = async (data, io, connected_users) => {
