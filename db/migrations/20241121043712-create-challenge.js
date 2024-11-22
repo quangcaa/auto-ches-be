@@ -30,7 +30,7 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       game_id: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING,
         references: {
           model: 'games',

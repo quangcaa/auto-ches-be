@@ -1,4 +1,5 @@
-const { sequelize, User, Follow, Game } = require('../db/models')
+const { sequelize, User, Follow, Game, Challenge, Notification } = require('../db/models')
+const { getIO, getConnectedUsers } = require('../socket/socket.be')
 
 class ProfileController {
     // @route [GET] /@/:username
@@ -157,33 +158,84 @@ class ProfileController {
     // @access Private
     async challengeUser(req, res) {
         const { username } = req.params
-        const follower = req.user_id
+        const inviter = req.user_id
 
         try {
-            const user = await User.findOne({ where: { username } })
-            if (!user) {
+            const challengedUser = await User.findOne({ where: { username } })
+            if (!challengedUser) {
                 return res.status(400).json({ success: false, message: 'User not found' })
             }
 
-            // fetch following list
-            const followingList = await sequelize.query(
-                `  
-                SELECT f.following_id, u.username, u.online, u.last_login
-                FROM follows f
-                JOIN users u ON u.user_id = f.following_id
-                WHERE f.follower_id = ?
-                `,
-                {
-                    replacements: [follower],
-                    type: sequelize.QueryTypes.SELECT,
-                }
-            )
+            const receiver_id = challengedUser.user_id
+            if (inviter === receiver_id) {
+                return res.status(400).json({ success: false, message: 'You cannot challenge yourself.' })
+            }
 
-            return res.status(200).json({ success: true, followingList })
+            const existingChallenge = await Challenge.findOne({
+                where: {
+                    sender_id: inviter,
+                    receiver_id: receiver_id,
+                    status: 'pending'
+                }
+            })
+            if (existingChallenge) {
+                return res.status(400).json({ success: false, message: 'A pending challenge already exists.' });
+            }
+
+            // Check if inviter is following the challenged user
+            /*
+            const isFollowing = await sequelize.query(`
+                SELECT 1 FROM follows 
+                WHERE follower_id = ? AND following_id = ?
+            `, {
+                replacements: [inviterId, receiverId],
+                type: sequelize.QueryTypes.SELECT,
+            });
+
+            if (isFollowing.length === 0) {
+                return res.status(400).json({ success: false, message: 'You can only challenge users you are following.' });
+            }
+            */
+
+            const newChallenge = await Challenge.create({
+                sender_id: inviter,
+                receiver_id: receiver_id,
+                status: 'pending',
+                is_read: false,
+                created_at: new Date()
+            });
+
+            // notify the challenged user via socket.io
+            const io = getIO()
+            const connected_users = getConnectedUsers()
+            const receipent_socket_id = connected_users.get(receiver_id)
+            if (receipent_socket_id) {
+                io.to(receipent_socket_id).emit('newChallenge', {
+                    challenge_id: newChallenge.challenge_id,
+                    sender_id: inviter,
+                    receiver_id: receiver_id,
+                    status: newChallenge.status,
+                    created_at: newChallenge.created_at
+                });
+            } else {
+                console.log(`User ${receiver_id} is not connected via Socket.IO.`);
+            }
+
+            return res.status(201).json({
+                success: true,
+                message: 'Challenge sent successfully.',
+                challenge: {
+                    challenge_id: newChallenge.challenge_id,
+                    sender_id: newChallenge.sender_id,
+                    receiver_id: newChallenge.receiver_id,
+                    status: newChallenge.status,
+                    created_at: newChallenge.created_at
+                }
+            });
         } catch (error) {
             return res.status(400).json({
                 success: false,
-                message: `Error in getAllFollowing: ${error.message}`
+                message: `Error in challengeUser: ${error.message}`
             })
         }
     }
