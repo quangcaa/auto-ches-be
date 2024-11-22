@@ -1,6 +1,6 @@
 const { sequelize, Chat, User } = require('../db/models');
 const { Op } = require('sequelize');
-// const { io, getSocketIdByUserId } = require('../socket/socket.js');
+const { getIO, getConnectedUsers } = require('../socket/socket.be')
 
 class InboxController {
     // @route [GET] /inbox
@@ -23,8 +23,8 @@ class InboxController {
                     [
                         sequelize.literal(`
                             CASE 
-                                WHEN sender_id = ${my_id} THEN chat_receiver_id_fk.username 
-                                ELSE chat_sender_id_fk.username 
+                                WHEN sender_id = ${my_id} THEN Receiver.username 
+                                ELSE Sender.username 
                             END
                         `), 
                         'user_name'
@@ -46,12 +46,12 @@ class InboxController {
                 include: [
                     {
                         model: User,
-                        as: 'chat_sender_id_fk',
+                        as: 'Sender',
                         attributes: [],
                     },
                     {
                         model: User,
-                        as: 'chat_receiver_id_fk',
+                        as: 'Receiver',
                         attributes: [],
                     }
                 ],
@@ -99,12 +99,11 @@ class InboxController {
                                 { sender_id: my_id, receiver_id: other_user_id },
                                 { sender_id: other_user_id, receiver_id: my_id }
                             ]
-                        },
-                        { game_id: null }
+                        }
                     ]
                 },
                 attributes: { 
-                    exclude: ['game_id', 'chat_id'] 
+                    exclude: ['chat_id'] 
                 },
                 order: [['time', 'ASC']],
                 raw: true
@@ -180,11 +179,6 @@ class InboxController {
         }
 
         try {
-            // const otherUserSocketId = await getSocketIdByUserId(other_user_id);
-            // if (otherUserSocketId) {
-            //     io.to(otherUserSocketId).emit('newMessage', message);
-            // }
-            
             const newMessage = await Chat.create({
                 sender_id: my_id,
                 receiver_id: other_user_id,

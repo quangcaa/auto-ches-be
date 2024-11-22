@@ -11,16 +11,22 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Chat.belongsTo(models.Game, {
+        as: 'chat_game_id_fk',
+        foreignKey: 'game_id',
+        onUpdate: 'CASCASE',
+        onDelete: 'CASCADE'
+      });
       Chat.belongsTo(models.User, {
         as: 'Sender',
         foreignKey: 'sender_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
       Chat.belongsTo(models.User, {
         as: 'Receiver',
         foreignKey: 'receiver_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
     }
@@ -31,6 +37,15 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
+    },
+    game_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'games',
+        key: 'game_id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
     sender_id: {
       type: DataTypes.INTEGER,

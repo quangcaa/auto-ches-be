@@ -99,7 +99,7 @@ class NotificationController {
                 `,
                 {
                     replacements: [my_id],
-                    type: sequelize.QueryTypes.SELECT,
+                    type: sequelize.QueryTypes.DELETE,
                 }
             )
 

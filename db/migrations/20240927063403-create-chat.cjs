@@ -9,6 +9,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      game_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'games',
+          key: 'game_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
       sender_id: {
         allowNull: false,
         type: Sequelize.INTEGER,

@@ -31,6 +31,9 @@ class GameManager {
                 socket.join(game_id)
                 socket.emit(GAME_CREATED, game_id)
 
+                // new
+                io.emit('update_lobby', Array.from(this.games.values()));
+
                 callback(game_id)
             } catch (error) {
                 console.error('Error creating room:', error)
