@@ -8,13 +8,22 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING
       },
-      time_control_type: {
+      game_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'games',
+          key: 'game_id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      time_control_name: {
         type: Sequelize.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical'),
       },
-      initial: {
+      base_time: {
         type: Sequelize.STRING
       },
-      increment: {
+      increment_by_turn: {
         type: Sequelize.STRING
       },
     });

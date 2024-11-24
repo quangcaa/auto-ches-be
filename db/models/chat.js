@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Chat.belongsTo(models.Game, {
         as: 'chat_game_id_fk',
         foreignKey: 'game_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
       Chat.belongsTo(models.User, {

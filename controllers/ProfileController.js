@@ -31,7 +31,7 @@ class ProfileController {
             // fetch user games
             const userGames = await sequelize.query(
                 `
-                SELECT g.game_id, g.variant_id, g.time_control_id, g.rated, g.start_time, g.end_time, g.result, g.status, g.current_fen
+                SELECT g.game_id, g.variant_id, g.time_control_id, g.rated, g.start_time, g.end_time, g.result, g.status, g.fen
                 FROM games g
                 WHERE g.white_player_id = ? OR g.black_player_id = ?
                 ORDER BY g.start_time DESC
@@ -106,11 +106,48 @@ class ProfileController {
                 }
             )
 
-            return res.status(200).json({ success: true, followingList })
+            return res.status(200).json(followingList)
         } catch (error) {
             return res.status(400).json({
                 success: false,
                 message: `Error in getAllFollowing: ${error.message}`
+            })
+        }
+    }
+
+
+    // @route [GET] /@/:username/follower
+    // @desc get all user's follower
+    // @access Private
+    async getAllFollower(req, res) {
+        const { username } = req.params
+        // const follower = req.user_id
+
+        try {
+            const user = await User.findOne({ where: { username } })
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'User not found' })
+            }
+
+            // fetch follower list
+            const followerList = await sequelize.query(
+                `  
+                SELECT f.follower_id, u.username, u.last_login
+                FROM follows f
+                JOIN users u ON u.user_id = f.follower_id
+                WHERE f.following_id = ?
+                `,
+                {
+                    replacements: [user.user_id],
+                    type: sequelize.QueryTypes.SELECT,
+                }
+            )
+
+            return res.status(200).json(followerList)
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: `Error in getAllFollower: ${error.message}`
             })
         }
     }

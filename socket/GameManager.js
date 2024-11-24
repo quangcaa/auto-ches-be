@@ -7,15 +7,18 @@ const {
     JOIN_GAME,
     LEAVE_GAME,
     GAME_OVER,
-    SEND_MESSAGE
+    SEND_MESSAGE,
+    JOIN_QUICK_PAIRING
 } = require('./message')
 
 class GameManager {
     constructor() {
         this.games = new Map()
+        this.waitingPlayers = []
+        this.pendingInvites = new Map()
     }
 
-    handleEvent(socket, io) {
+    handleEvent(socket, io, connected_users) {
         console.log("ran into GameManager/handleEvent")
 
         socket.on(CREATE_GAME, async (callback) => {
@@ -37,6 +40,56 @@ class GameManager {
                 callback(game_id)
             } catch (error) {
                 console.error('Error creating room:', error)
+            }
+        })
+
+        socket.on(JOIN_QUICK_PAIRING, async (callback) => {
+            try {
+                // Add player to the waiting queue if not already in it
+                if (!this.waitingPlayers.includes(socket.user_id)) {
+                    this.waitingPlayers.push(socket.user_id);
+                }
+
+                console.log(`Player ${socket.user_id} joined quick pairing`);
+                // If there are at least two players waiting, create a game
+                if (this.waitingPlayers.length >= 2) {
+                    const player1Id = this.waitingPlayers.shift();
+                    const player2Id = this.waitingPlayers.shift();
+
+                    const { nanoid } = await import('nanoid');
+                    const game_id = nanoid();
+
+                    const game = new Game(player1Id, player2Id, game_id);
+                    this.games.set(game_id, game);
+
+                    // Create game in the database
+                    await game.createGameInDb();
+
+                    // Join game room
+                    const player1SocketId = connected_users.get(player1Id)
+                    const player2SocketId = connected_users.get(player1Id)
+
+                    const player1Socket = io.sockets.sockets.get(player1SocketId);
+                    const player2Socket = io.sockets.sockets.get(player2SocketId);
+
+                    player1Socket.join(game_id);
+                    player2Socket.join(game_id);
+
+                    // Notify players
+                    player1Socket.emit(GAME_CREATED, game_id);
+                    player2Socket.emit(GAME_CREATED, game_id);
+
+                    io.to(game_id).emit(START_GAME, { white: player1Id, black: player2Id });
+
+                    console.log(`Quick pairing game created: ${game_id}`);
+
+                    callback({ success: true, game_id });
+                } else {
+                    callback({ success: true, message: 'Waiting for an opponent...' });
+                }
+            } catch (error) {
+                console.error('Error in quick pairing:', error);
+                callback({ success: false, message: 'Error in quick pairing.' });
             }
         })
 
@@ -65,6 +118,12 @@ class GameManager {
                 callback({ success: false, message: 'Game not found.' })
             }
         })
+
+        // socket.on("move", (move) => {
+        //     const { game_id } = move;
+        //     io.to(game_id).emit("move", move); // Gửi nước đi cho tất cả người chơi trong phòng
+        // });
+
 
         socket.on(SEND_MESSAGE, ({ game_id, message }) => {
             const game = this.games.get(game_id)

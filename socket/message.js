@@ -11,6 +11,8 @@ const RESIGN = 'resign'
 const DRAW_OFFER = 'draw_offer'
 const DRAW_RESPONSE = 'draw_response'
 
+const JOIN_QUICK_PAIRING = 'join_quick_pairing'
+
 const SEND_MESSAGE = 'send_message'
 const RECEIVE_MESSAGE = 'receive_message'
 const NOTIFICATION_IN_GAME = 'notification_in_game'
@@ -64,5 +66,6 @@ module.exports = {
     BLACK_WINS,
     DRAW,
     SEND_INBOX_MESSAGE,
-    RECEIVE_INBOX_MESSAGE,
+    RECEIVE_INBOX_MESSAGE, 
+    JOIN_QUICK_PAIRING
 }

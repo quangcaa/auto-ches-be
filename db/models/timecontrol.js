@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      TimeControl.belongsTo(models.Game, {
+        as: 'Game',
+        foreignKey: 'game_id',
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      });
     }
   }
   TimeControl.init({
@@ -19,13 +25,22 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.STRING
     },
-    time_control_type: {
+    game_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'games',
+        key: 'game_id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
+    time_control_name: {
       type: DataTypes.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical'),
     },
-    initial: {
+    base_time: {
       type: DataTypes.STRING
     },
-    increment: {
+    increment_by_turn: {
       type: DataTypes.STRING
     },
   }, {

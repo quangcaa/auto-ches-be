@@ -56,9 +56,9 @@ class Game {
         }
 
         const moveTimestamp = new Date(Date.now())
-        await this.addMoveToDb(move, moveTimestamp)
+        await this.addMoveToDb(result, moveTimestamp)
 
-        socket.to(this.game_id).emit(MOVE, move)
+        socket.to(this.game_id).emit(MOVE, result)
         callback({ success: true })
 
         // Check if the game is over after the move
@@ -124,7 +124,7 @@ class Game {
             }, { transaction })
 
             await DbGame.update(
-                { current_fen: move.after },
+                { fen: move.after },
                 { where: { game_id: this.game_id }, transaction }
             )
 

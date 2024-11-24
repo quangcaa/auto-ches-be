@@ -45,7 +45,7 @@ const initSocket = (httpServer) => {
             await handleSendMessage(data, io, connected_users)
         })
 
-        gameManager.handleEvent(socket, io)
+        gameManager.handleEvent(socket, io, connected_users)
 
         socket.on('disconnect', () => {
             console.log(`[SOCKET]: User [${socket.user_id}] disconnected with socket id: [${socket.id}].`)
