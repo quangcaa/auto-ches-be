@@ -8,26 +8,8 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING
       },
-      variant_id: {
+      type: {
         type: Sequelize.STRING,
-        references: {
-          model: 'variants',
-          key: 'variant_id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
-      time_control_id: {
-        type: Sequelize.STRING,
-        references: {
-          model: 'timeControls',
-          key: 'time_control_id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
-      rated: {
-        type: Sequelize.BOOLEAN,
       },
       white_player_id: {
         allowNull: false,
@@ -66,6 +48,12 @@ module.exports = {
       fen: {
         type: Sequelize.STRING,
         defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+      },
+      strength: {
+        type: Sequelize.STRING,
+      },
+      side: {
+        type: Sequelize.STRING,
       },
     });
   },

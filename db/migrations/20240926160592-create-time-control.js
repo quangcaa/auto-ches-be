@@ -18,7 +18,7 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       time_control_name: {
-        type: Sequelize.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical'),
+        type: Sequelize.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical', 'Unlimited'),
       },
       base_time: {
         type: Sequelize.STRING
