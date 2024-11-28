@@ -52,9 +52,6 @@ module.exports = {
       strength: {
         type: Sequelize.STRING,
       },
-      side: {
-        type: Sequelize.STRING,
-      },
     });
   },
   async down(queryInterface, Sequelize) {

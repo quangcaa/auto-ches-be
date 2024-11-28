@@ -20,6 +20,14 @@ module.exports = {
         last_login: new Date(),
         refresh_token: null
       },
+      {
+        username: 'bot',
+        email: 'bot@gmail.com',
+        password: '$2a$12$eoGfe8LmhtF9kr5nBMm.MOPE/beTQgJRx6NLGYAyBt.C2ei7JA7dG',
+        joined_date: new Date(),
+        last_login: new Date(),
+        refresh_token: null
+      },
     ], {});
   },
 

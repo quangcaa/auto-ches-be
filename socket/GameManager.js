@@ -10,6 +10,7 @@ const {
     SEND_MESSAGE,
     JOIN_QUICK_PAIRING
 } = require('./message')
+const shortid = require('shortid');
 
 class GameManager {
     constructor() {
@@ -23,8 +24,7 @@ class GameManager {
 
         socket.on(CREATE_GAME, async (callback) => {
             try {
-                const { nanoid } = await import('nanoid')
-                const game_id = nanoid()
+                const game_id = shortid.generate()
 
                 const game = new Game(socket.user_id, null, game_id)
                 this.games.set(game_id, game)

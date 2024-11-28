@@ -82,9 +82,6 @@ module.exports = (sequelize, DataTypes) => {
     strength: {
       type: DataTypes.STRING,
     },
-    side: {
-      type: DataTypes.STRING,
-    },
   }, {
     sequelize,
     modelName: 'Game',
