@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     },
     time_control_name: {
-      type: DataTypes.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical'),
+      type: DataTypes.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical', 'Unlimited'),
     },
     base_time: {
       type: DataTypes.STRING

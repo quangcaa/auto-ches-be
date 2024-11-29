@@ -36,14 +36,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
     },
-    last_login: {
-      type: DataTypes.DATE,
-    },
     refresh_token: {
       type: DataTypes.STRING
     },
     online: {
-      type: DataTypes.BOOLEAN
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     }
   }, {
     sequelize,

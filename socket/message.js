@@ -27,6 +27,10 @@ const GET_ONLINE_PLAYERS = 'get_online_players'
 const INVITE_PLAYER = 'invite_player'
 const INVITE_RESPONSE = 'invite_response'
 
+// send notification
+const SEND_NOTIFICATION = 'send_notification'
+
+
 // game status
 const IN_PROGRESS = 'in_progress'
 const COMPLETED = 'completed'
@@ -67,5 +71,6 @@ module.exports = {
     DRAW,
     SEND_INBOX_MESSAGE,
     RECEIVE_INBOX_MESSAGE, 
-    JOIN_QUICK_PAIRING
+    JOIN_QUICK_PAIRING,
+    SEND_NOTIFICATION
 }

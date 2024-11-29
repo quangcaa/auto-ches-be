@@ -2,7 +2,6 @@ const { Challenge } = require('../db/models')
 const { Op } = require('sequelize')
 
 class NotificationController {
-
     // @route [GET] /challenge/
     // @desc get all challenges
     // @access Private

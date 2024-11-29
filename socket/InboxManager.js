@@ -1,10 +1,7 @@
-
-
 const { RECEIVE_INBOX_MESSAGE } = require('./message')
 
 const handleSendMessage = async (data, io, connected_users) => {
     const { senderId, senderName, receiverId, message } = data
-    console.log(data)
 
     if (!senderId || !senderName || !receiverId || !message) {
         console.error('Invalid message data:', data);
