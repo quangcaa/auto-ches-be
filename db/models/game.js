@@ -37,9 +37,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true,
     },
-    type: {
-      type: DataTypes.STRING,
-    },
     white_player_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -78,9 +75,6 @@ module.exports = (sequelize, DataTypes) => {
     fen: {
       type: DataTypes.STRING,
       defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-    },
-    strength: {
-      type: DataTypes.STRING,
     },
   }, {
     sequelize,

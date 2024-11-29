@@ -1,5 +1,7 @@
-const { sequelize, User, Follow } = require('../db/models')
+const { sequelize, User, Follow, Notification } = require('../db/models')
 const { Op } = require('sequelize')
+const { getIO, getConnectedUsers } = require('../socket/socket.be')
+const { SEND_NOTIFICATION } = require('../socket/message')
 
 class RelationController {
     // @route [POST] /rel/follow/:username
@@ -10,6 +12,7 @@ class RelationController {
         const my_id = req.user_id
 
         try {
+            // check user exists
             const user = await User.findOne({
                 where: { username },
                 attributes: ['user_id']
@@ -34,6 +37,29 @@ class RelationController {
                 follower_id: my_id,
                 following_id: user.user_id
             })
+
+            // update notification db
+            await Notification.create({
+                user_id: followed.following_id,
+                type: 'follow',
+                content: 'followed you',
+                source_id: followed.follower_id,
+                created_at: new Date()
+            })
+
+            // send socket
+            const connected_users = getConnectedUsers()
+            const io = getIO()
+
+            const receiver_socket_id = connected_users.get(followed.following_id)
+            if (receiver_socket_id) {
+                io.to(receiver_socket_id).emit(SEND_NOTIFICATION, {
+                    senderId: followed.follower_id,
+                    receiverId: followed.following_id,
+                });
+            } else {
+                console.log("User not connected")
+            }
 
             return res.status(200).json({ success: true, message: 'Followed' })
         } catch (error) {
@@ -76,6 +102,15 @@ class RelationController {
                 where: {
                     follower_id: my_id,
                     following_id: user.user_id
+                }
+            })
+
+            // update notification db
+            await Notification.destroy({
+                where: {
+                    user_id: checkFollow.following_id,
+                    source_id: checkFollow.follower_id,
+                    type: 'follow' 
                 }
             })
 

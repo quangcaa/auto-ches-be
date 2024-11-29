@@ -1,4 +1,4 @@
-const { sequelize, User, Follow, Game, Challenge, Notification } = require('../db/models')
+const { sequelize, User, Follow, Game, Challenge, Notification, Report } = require('../db/models')
 const { getIO, getConnectedUsers } = require('../socket/socket.be')
 
 class ProfileController {
@@ -13,7 +13,7 @@ class ProfileController {
             // fetch user profile
             const userProfile = await sequelize.query(
                 `
-                SELECT u.user_id, u.username, u.joined_date, u.last_login, p.real_name, p.bio, p.flag, p.location
+                SELECT u.user_id, u.username, u.joined_date, p.real_name, p.bio, p.flag, p.location, u.online
                 FROM users u
                 JOIN profiles p ON u.user_id = p.user_id
                 WHERE u.username = ?
@@ -31,7 +31,7 @@ class ProfileController {
             // fetch user games
             const userGames = await sequelize.query(
                 `
-                SELECT g.game_id, g.variant_id, g.time_control_id, g.rated, g.start_time, g.end_time, g.result, g.status, g.fen
+                SELECT g.game_id, g.start_time, g.end_time, g.result, g.status, g.fen
                 FROM games g
                 WHERE g.white_player_id = ? OR g.black_player_id = ?
                 ORDER BY g.start_time DESC
@@ -158,33 +158,34 @@ class ProfileController {
     // @access Private
     async reportUser(req, res) {
         const { username } = req.params
-        const follower = req.user_id
+        const { reason, description } = req.body
+        const reporter_id = req.user_id
 
         try {
-            const user = await User.findOne({ where: { username } })
-            if (!user) {
+            const reportedUser = await User.findOne({ where: { username } })
+            if (!reportedUser) {
                 return res.status(400).json({ success: false, message: 'User not found' })
             }
 
-            // fetch following list
-            const followingList = await sequelize.query(
-                `  
-                SELECT f.following_id, u.username, u.online, u.last_login
-                FROM follows f
-                JOIN users u ON u.user_id = f.following_id
-                WHERE f.follower_id = ?
-                `,
-                {
-                    replacements: [follower],
-                    type: sequelize.QueryTypes.SELECT,
-                }
-            )
+            const reported_id = reportedUser.user_id
 
-            return res.status(200).json({ success: true, followingList })
+            const newReport = await Report.create({
+                reporter_id,
+                reported_id,
+                reason,
+                description,
+                created_at: new Date()
+            })
+
+            return res.status(201).json({
+                success: true,
+                message: 'Report submitted successfully.',
+                report: newReport
+            })
         } catch (error) {
             return res.status(400).json({
                 success: false,
-                message: `Error in getAllFollowing: ${error.message}`
+                message: `Error in reportUser: ${error.message}`
             })
         }
     }
@@ -216,33 +217,19 @@ class ProfileController {
                 }
             })
             if (existingChallenge) {
-                return res.status(400).json({ success: false, message: 'A pending challenge already exists.' });
+                return res.status(400).json({ success: false, message: 'A pending challenge already exists.' })
             }
 
-            // Check if inviter is following the challenged user
-            /*
-            const isFollowing = await sequelize.query(`
-                SELECT 1 FROM follows 
-                WHERE follower_id = ? AND following_id = ?
-            `, {
-                replacements: [inviterId, receiverId],
-                type: sequelize.QueryTypes.SELECT,
-            });
-
-            if (isFollowing.length === 0) {
-                return res.status(400).json({ success: false, message: 'You can only challenge users you are following.' });
-            }
-            */
-
+            // update db
             const newChallenge = await Challenge.create({
                 sender_id: inviter,
                 receiver_id: receiver_id,
                 status: 'pending',
                 is_read: false,
                 created_at: new Date()
-            });
+            })
 
-            // notify the challenged user via socket.io
+            // send socket.io
             const io = getIO()
             const connected_users = getConnectedUsers()
             const receipent_socket_id = connected_users.get(receiver_id)
@@ -253,9 +240,9 @@ class ProfileController {
                     receiver_id: receiver_id,
                     status: newChallenge.status,
                     created_at: newChallenge.created_at
-                });
+                })
             } else {
-                console.log(`User ${receiver_id} is not connected via Socket.IO.`);
+                console.log(`User ${receiver_id} is not connected via Socket.IO.`)
             }
 
             return res.status(201).json({
@@ -268,7 +255,7 @@ class ProfileController {
                     status: newChallenge.status,
                     created_at: newChallenge.created_at
                 }
-            });
+            })
         } catch (error) {
             return res.status(400).json({
                 success: false,

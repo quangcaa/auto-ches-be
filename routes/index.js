@@ -9,6 +9,7 @@ const searchRouter = require('./search')
 const notificationRouter = require('./notification')
 const challengeRouter = require('./challenge')
 const gameRouter = require('./game')
+const reportRouter = require('./report')
 
 const route = (app) => {
     app.use('/auth', authRouter)
@@ -22,6 +23,7 @@ const route = (app) => {
     app.use('/notification', notificationRouter)
     app.use('/challenge', challengeRouter)
     app.use('/game', gameRouter)
+    app.use('/report', reportRouter)
 }
 
 module.exports = route

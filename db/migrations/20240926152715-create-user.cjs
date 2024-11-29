@@ -28,14 +28,12 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       },
-      last_login: {
-        type: Sequelize.DATE
-      },
       refresh_token: {
         type: Sequelize.STRING
       },
       online: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       }
     });
   },
