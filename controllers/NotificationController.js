@@ -1,4 +1,4 @@
-const { User, Notification } = require('../db/models')
+const { sequelize, User, Notification } = require('../db/models')
 const { Op } = require('sequelize')
 
 class NotificationController {
@@ -39,6 +39,8 @@ class NotificationController {
     async markReadSpecificNotification(req, res) {
         const { notification_id } = req.params
         const my_id = req.user_id
+
+        console.log('hello')
 
         try {
             const result = await Notification.update(

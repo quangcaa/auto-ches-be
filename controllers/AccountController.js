@@ -41,7 +41,7 @@ class AccountController {
 
             // check update
             if (updatedProfile === 0) {
-                return res.status(400).json({ success: false, message: 'User not found or no changes made' })
+                return res.status(400).json({ success: false, message: 'No changes made' })
             }
 
             return res.status(200).json({ success: true, message: 'Profile updated successfully' })

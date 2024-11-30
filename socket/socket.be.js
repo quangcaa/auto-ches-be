@@ -46,6 +46,9 @@ const initSocket = (httpServer) => {
         connected_users.set(socket.user_id, socket.id)
         console.log(`[SOCKET]: User [${socket.user_id}] connected with socket id: [${socket.id}].`)
 
+        // emit 'user_online' event to all clients
+        io.emit('user_online', { user_id: socket.user_id })
+
         socket.on(SEND_INBOX_MESSAGE, async (data) => {
             await handleSendMessage(data, io, connected_users)
         })
@@ -58,6 +61,9 @@ const initSocket = (httpServer) => {
 
             // update user online status
             await User.update({ online: false }, { where: { user_id: socket.user_id } });
+
+            // emit 'user_offline' event to all clients
+            io.emit('user_offline', { user_id: socket.user_id });
         })
     })
 }

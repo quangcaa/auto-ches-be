@@ -1,11 +1,11 @@
-const { User } = require('../db/models')
+const { User, Report } = require('../db/models')
 const { Op } = require('sequelize')
 
 class ReportController {
 
     // @route [GET] /report/
     // @desc Get all reports
-     // @access Private
+    // @access Private
     async getAllReport(req, res) {
         try {
             const reports = await Report.findAll({
@@ -23,7 +23,9 @@ class ReportController {
                 message: `Error in getAllReport: ${error.message}`
             });
         }
-  }
+    }
+
+    
 }
 
 module.exports = new ReportController()

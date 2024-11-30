@@ -95,7 +95,7 @@ class ProfileController {
             // fetch following list
             const followingList = await sequelize.query(
                 `  
-                SELECT f.following_id, u.username, u.online, u.last_login
+                SELECT f.following_id, u.username, u.online
                 FROM follows f
                 JOIN users u ON u.user_id = f.following_id
                 WHERE f.follower_id = ?
@@ -132,7 +132,7 @@ class ProfileController {
             // fetch follower list
             const followerList = await sequelize.query(
                 `  
-                SELECT f.follower_id, u.username, u.last_login
+                SELECT f.follower_id, u.username
                 FROM follows f
                 JOIN users u ON u.user_id = f.follower_id
                 WHERE f.following_id = ?

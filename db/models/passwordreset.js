@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Passwordreset.belongsTo(models.User, { 
         as: 'passwordreset_user_id_fk', 
-        foreignKey: 'userId',
+        foreignKey: 'user_id',
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });

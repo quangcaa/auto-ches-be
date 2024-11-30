@@ -1,4 +1,4 @@
-const { sequelize, User, Forum, Topic, Post } = require('../db/models')
+const { sequelize, User, Forum, Topic, Post, Notification } = require('../db/models')
 const { Op } = require('sequelize')
 
 class ForumController {
@@ -227,7 +227,7 @@ class ForumController {
                 return res.status(400).json({ success: false, message: 'Topic not exist' })
             }
 
-            // create
+            // create post
             const createdPost = await Post.create({
                 topic_id,
                 user_id,
@@ -235,6 +235,17 @@ class ForumController {
             })
             if (!createdPost) {
                 return res.status(400).json({ success: false, message: 'Error in create post ! ! !' })
+            }
+
+            // create noti
+            if (checkTopic.user_id !== user_id) {
+                await Notification.create({
+                    user_id: checkTopic.user_id,
+                    type: 'forum',
+                    content: 'A new post was added to your topic',
+                    source_id: topic_id,
+                    created_at: new Date()
+                })
             }
 
             return res.status(200).json({ success: true, post: createdPost })
