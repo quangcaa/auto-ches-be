@@ -94,9 +94,6 @@ class Game {
 
         const game = await DbGame.create({
             game_id: this.game_id,
-            variant_id: 'standard',
-            time_control_id: 'Ra1',
-            rated: 0,
             white_player_id: this.player1,
             black_player_id: this.player2 ?? null,
             start_time: this.startTime,

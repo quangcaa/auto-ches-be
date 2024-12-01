@@ -1,4 +1,5 @@
 const { Game } = require('./Game')
+const shortid = require('shortid')
 const {
     CREATE_GAME,
     GAME_CREATED,
@@ -10,13 +11,16 @@ const {
     SEND_MESSAGE,
     JOIN_QUICK_PAIRING
 } = require('./message')
-const shortid = require('shortid');
 
 class GameManager {
     constructor() {
         this.games = new Map()
         this.waitingPlayers = []
         this.pendingInvites = new Map()
+
+        // test
+        this.queue = []
+        this.playersQueue = []
     }
 
     handleEvent(socket, io, connected_users) {
@@ -35,65 +39,41 @@ class GameManager {
                 socket.emit(GAME_CREATED, game_id)
 
                 // new
-                io.emit('update_lobby', Array.from(this.games.values()));
+                io.emit('update_lobby', Array.from(this.games.values()))
 
-                callback(game_id)
+                callback({ success: true, game_id })
             } catch (error) {
                 console.error('Error creating room:', error)
             }
         })
 
-        socket.on(JOIN_QUICK_PAIRING, async (callback) => {
-            try {
-                // Add player to the waiting queue if not already in it
-                if (!this.waitingPlayers.includes(socket.user_id)) {
-                    this.waitingPlayers.push(socket.user_id);
-                }
+        socket.on(JOIN_QUICK_PAIRING, async () => {
+            this.playersQueue.push(socket)
 
-                console.log(`Player ${socket.user_id} joined quick pairing`);
-                // If there are at least two players waiting, create a game
-                if (this.waitingPlayers.length >= 2) {
-                    const player1Id = this.waitingPlayers.shift();
-                    const player2Id = this.waitingPlayers.shift();
+            if (this.playersQueue.length >= 2) {
+                const player1 = this.playersQueue.shift()
+                const player2 = this.playersQueue.shift()
 
-                    const { nanoid } = await import('nanoid');
-                    const game_id = nanoid();
+                const game_id = shortid.generate()
 
-                    const game = new Game(player1Id, player2Id, game_id);
-                    this.games.set(game_id, game);
+                const game = new Game(player1.user_id, player2.user_id, game_id)
+                this.games.set(game_id, game)
 
-                    // Create game in the database
-                    await game.createGameInDb();
+                await game.createGameInDb()
 
-                    // Join game room
-                    const player1SocketId = connected_users.get(player1Id)
-                    const player2SocketId = connected_users.get(player1Id)
+                console.log(`player1_id: ${game.player1} | player2_id: ${game.player2}`)
 
-                    const player1Socket = io.sockets.sockets.get(player1SocketId);
-                    const player2Socket = io.sockets.sockets.get(player2SocketId);
+                player1.join(game_id)
+                player2.join(game_id)
 
-                    player1Socket.join(game_id);
-                    player2Socket.join(game_id);
+                player1.emit("paired", game_id)
+                player2.emit("paired", game_id)
 
-                    // Notify players
-                    player1Socket.emit(GAME_CREATED, game_id);
-                    player2Socket.emit(GAME_CREATED, game_id);
-
-                    io.to(game_id).emit(START_GAME, { white: player1Id, black: player2Id });
-
-                    console.log(`Quick pairing game created: ${game_id}`);
-
-                    callback({ success: true, game_id });
-                } else {
-                    callback({ success: true, message: 'Waiting for an opponent...' });
-                }
-            } catch (error) {
-                console.error('Error in quick pairing:', error);
-                callback({ success: false, message: 'Error in quick pairing.' });
+                io.to(game_id).emit(START_GAME, { white: game.player1, black: game.player2 })
             }
         })
 
-        socket.on(JOIN_GAME, (game_id) => {
+        socket.on(JOIN_GAME, (game_id, callback) => {
             const game = this.games.get(game_id)
             if (game) {
                 game.addPlayer(socket.user_id)
@@ -101,11 +81,10 @@ class GameManager {
                 socket.join(game_id)
                 io.to(game_id).emit(START_GAME, { white: game.player1, black: game.player2 })
 
-                console.log(`user joined room ${game_id}`)
-                console.log(`user joined room ${this.games.get(game_id).player1}`)
-                console.log(`user joined room ${this.games.get(game_id).player2}`)
+                callback({ success: true })
             } else {
                 socket.emit('error', 'Room not found')
+                callback({ success: false, message: 'Game not found' })
             }
         })
 
@@ -118,12 +97,6 @@ class GameManager {
                 callback({ success: false, message: 'Game not found.' })
             }
         })
-
-        // socket.on("move", (move) => {
-        //     const { game_id } = move;
-        //     io.to(game_id).emit("move", move); // Gửi nước đi cho tất cả người chơi trong phòng
-        // });
-
 
         socket.on(SEND_MESSAGE, ({ game_id, message }) => {
             const game = this.games.get(game_id)

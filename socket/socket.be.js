@@ -1,16 +1,16 @@
 const { Server } = require('socket.io')
+const shortid = require('shortid')
 const { GameManager } = require('./GameManager')
 const { handleSendMessage } = require('./InboxManager')
 const { User } = require('../db/models')
+const {
+    SEND_INBOX_MESSAGE,
+} = require('./message')
 
 let io
 
 const connected_users = new Map() // online users
 const gameManager = new GameManager() // instance
-
-const {
-    SEND_INBOX_MESSAGE
-} = require('./message')
 
 const CLIENT_URL = process.env.CLIENT_URL
 
