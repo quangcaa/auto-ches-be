@@ -8,5 +8,6 @@ router.get('/my-profile', isAuth, AccountController.getMyProfile)
 router.put('/edit-profile', isAuth, AccountController.editProfile)
 router.patch('/change-password', isAuth, AccountController.changePassword)
 router.delete('/close-account', isAuth, AccountController.closeAccount)
+router.delete('/delete-account/:id', isAuth, AccountController.deleteAccountById)
 
 module.exports = router
