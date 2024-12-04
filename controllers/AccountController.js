@@ -121,6 +121,28 @@ class AccountController {
             })
         }
     }
+
+    // @route [DELETE] /account/delete-account/:id
+    // @desc delete a user by ID
+    // @access Admin
+    async deleteAccountById(req, res) {
+        const { id } = req.params;
+        try {
+            const user = await User.findByPk(id);
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+
+            await user.destroy();
+
+            return res.status(200).json({ success: true, message: 'User deleted successfully' });
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: `Error in deleteUserById: ${error.message}`,
+            });
+        }
+    }
 }
 
 module.exports = new AccountController()
