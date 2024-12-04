@@ -19,7 +19,7 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       black_player_id: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.INTEGER,
         references: {
           model: 'users',
