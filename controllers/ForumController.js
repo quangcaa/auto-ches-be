@@ -242,7 +242,7 @@ class ForumController {
                 await Notification.create({
                     user_id: checkTopic.user_id,
                     type: 'forum',
-                    content: 'A new post was added to your topic',
+                    content: 'New post on your topic',
                     source_id: topic_id,
                     created_at: new Date()
                 })

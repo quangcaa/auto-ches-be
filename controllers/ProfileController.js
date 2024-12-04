@@ -31,8 +31,13 @@ class ProfileController {
             // fetch user games
             const userGames = await sequelize.query(
                 `
-                SELECT g.game_id, g.start_time, g.end_time, g.result, g.status, g.fen
+                SELECT 
+                    g.*,
+                    wu.username AS white_player_username,
+                    bu.username AS black_player_username
                 FROM games g
+                LEFT JOIN users wu ON g.white_player_id = wu.user_id
+                LEFT JOIN users bu ON g.black_player_id = bu.user_id
                 WHERE g.white_player_id = ? OR g.black_player_id = ?
                 ORDER BY g.start_time DESC
                 `,

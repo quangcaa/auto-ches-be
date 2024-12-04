@@ -1,4 +1,4 @@
-const { sequelize, User, Notification } = require('../db/models')
+const { sequelize, User, Notification, Topic } = require('../db/models')
 const { Op } = require('sequelize')
 
 class NotificationController {
@@ -10,20 +10,52 @@ class NotificationController {
         const my_id = req.user_id
 
         try {
-            const notifications = await sequelize.query(
-                `  
-                SELECT *
-                FROM notifications n
-                WHERE n.user_id = ?
-                ORDER BY created_at DESC
-                `,
-                {
-                    replacements: [my_id],
-                    type: sequelize.QueryTypes.SELECT,
-                }
-            )
+            // const notifications = await sequelize.query(
+            //     `  
+            //     SELECT *
+            //     FROM notifications
+            //     WHERE user_id = ?
+            //     ORDER BY created_at DESC
+            //     `,
+            //     {
+            //         replacements: [my_id],
+            //         type: sequelize.QueryTypes.SELECT,
+            //     }
+            // )
 
-            return res.status(200).json({ success: true, data: notifications })
+            const notifications = await Notification.findAll({
+                where: { user_id: my_id },
+                order: [['created_at', 'DESC']],
+              });
+        
+              const notificationDetails = await Promise.all(
+                notifications.map(async (notification) => {
+                  let detail = {};
+                  if (notification.type === 'follow' || notification.type === 'inbox') {
+                    const user = await User.findByPk(notification.source_id, {
+                      attributes: ['user_id', 'username'],
+                    });
+                    detail = {
+                      source_id: user.user_id,
+                      username: user.username,
+                    };
+                  } else if (notification.type === 'forum') {
+                    const topic = await Topic.findByPk(notification.source_id, {
+                      attributes: ['topic_id', 'subject'],
+                    });
+                    detail = {
+                      topic_id: topic.topic_id,
+                      subject: topic.subject,
+                    };
+                  }
+                  return {
+                    ...notification.toJSON(),
+                    ...detail,
+                  };
+                })
+              );
+
+            return res.status(200).json({ success: true, data: notificationDetails })
         } catch (error) {
             return res.status(400).json({
                 success: false,
@@ -39,8 +71,6 @@ class NotificationController {
     async markReadSpecificNotification(req, res) {
         const { notification_id } = req.params
         const my_id = req.user_id
-
-        console.log('hello')
 
         try {
             const result = await Notification.update(
@@ -77,7 +107,7 @@ class NotificationController {
                 { where: { user_id: my_id } }
             )
 
-            return res.status(200).json({ success: true, message: '"All notifications marked as read' })
+            return res.status(200).json({ success: true })
         } catch (error) {
             return res.status(400).json({
                 success: false,
@@ -97,7 +127,7 @@ class NotificationController {
             await sequelize.query(
                 `  
                 DELETE FROM notifications
-                WHERE n.user_id = ?
+                WHERE user_id = ?
                 `,
                 {
                     replacements: [my_id],
@@ -105,7 +135,7 @@ class NotificationController {
                 }
             )
 
-            return res.status(200).json({ success: true, message: 'Deleted all notification ;(' })
+            return res.status(200).json({ success: true })
         } catch (error) {
             return res.status(400).json({
                 success: false,

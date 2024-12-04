@@ -2,9 +2,8 @@ const { Chess } = require('chess.js')
 const { sequelize, Game: DbGame, Move: DbMove, User: DbUser } = require('../db/models')
 const { PLAYER_EXIT, BLACK_WINS, WHITE_WINS, COMPLETED, GAME_OVER, MOVE, DRAW, RECEIVE_MESSAGE } = require('./message')
 
-
 class Game {
-    constructor(player1, player2, game_id) {
+    constructor(player1, player2, game_id, timeControl) {
         this.game_id = game_id
         this.player1 = player1
         this.player2 = player2
@@ -18,8 +17,16 @@ class Game {
         // this.player1TimeConsumed = 0
         // this.player2TimeConsumed = 0
 
-        this.player1Time = 10 * 60 * 1000;
-        this.player2Time = 10 * 60 * 1000;
+        this.baseTime = timeControl.base_time * 60 * 1000;
+        this.increment = timeControl.increment_by_turn * 1000;
+        this.playerTimes = {
+            w: this.baseTime, // Convert minutes to milliseconds
+            b: this.baseTime,
+          };
+          this.activePlayer = 'w';
+
+        // this.player1Time = this.base_time
+        // this.player2Time = this.base_time
     }
 
     async addPlayer(player2) {
@@ -45,7 +52,7 @@ class Game {
         try {
             result = this.board.move(move)
         } catch (error) {
-            console.error(`Invalid move attempted: ${JSON.stringify(move)}`, error);
+            // console.error(`Invalid move attempted: ${JSON.stringify(move)}`, error);
             callback({ success: false, message: 'Nước đi không hợp lệ.' })
             return
         }
@@ -54,6 +61,33 @@ class Game {
             callback({ success: false, message: 'Nước đi không hợp lệ.' })
             return
         }
+
+        // // Calculate time spent
+        const currentTime = Date.now();
+        const timeSpent = currentTime - this.lastMoveTime;
+      
+        // // Update active player's time
+        this.playerTimes[this.activePlayer] -= timeSpent;
+        if (this.playerTimes[this.activePlayer] <= 0) {
+            this.endGame(`${this.activePlayer === 'w' ? 'Black' : 'White'} wins on time.`);
+            return;
+        }
+
+        // Add increment after move
+        this.playerTimes[this.activePlayer] += this.increment;
+        
+        // // Update last move time and switch player
+        this.lastMoveTime = currentTime;
+        this.activePlayer = this.board.turn();
+      
+        // // Emit time update to clients
+        const timeData = {
+            whiteTime: this.playerTimes['w'],
+            blackTime: this.playerTimes['b'],
+          };
+          // Emit time update to both players
+          io.to(this.player1).emit('time_update', timeData);
+          io.to(this.player2).emit('time_update', timeData);
 
         const moveTimestamp = new Date(Date.now())
         await this.addMoveToDb(result, moveTimestamp)
@@ -105,8 +139,6 @@ class Game {
     async addMoveToDb(move, moveTimestamp) {
         const transaction = await sequelize.transaction()
 
-        console.log(move)
-
         try {
             await DbMove.create({
                 game_id: this.game_id,
@@ -116,7 +148,7 @@ class Game {
                 after: move.after,
                 move_number: this.moveCount += 1,
                 san: move.san,
-                time_taken: moveTimestamp.getTime() - this.lastMoveTime.getTime(),
+                time_taken: moveTimestamp - this.lastMoveTime,
                 created_at: moveTimestamp,
             }, { transaction })
 

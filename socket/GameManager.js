@@ -47,7 +47,24 @@ class GameManager {
             }
         })
 
-        socket.on(JOIN_QUICK_PAIRING, async () => {
+        socket.on('create_game_with_time_control', async (timeControl, callback) => {
+            try {
+                const game_id = shortid.generate()
+
+                console.log(timeControl)
+
+                const newGame = new Game(socket.user_id, null, game_id, timeControl)
+                this.games.set(game_id, newGame)
+
+                await newGame.createGameInDb()
+
+                callback({ success: true, game_id: game_id });
+            } catch (error) {
+                callback({ success: false, message: error.message });
+            }
+          });
+
+        socket.on(JOIN_QUICK_PAIRING, async (timeControl) => {
             this.playersQueue.push(socket)
 
             if (this.playersQueue.length >= 2) {
@@ -56,12 +73,13 @@ class GameManager {
 
                 const game_id = shortid.generate()
 
-                const game = new Game(player1.user_id, player2.user_id, game_id)
+                const game = new Game(player1.user_id, player2.user_id, game_id, timeControl)
                 this.games.set(game_id, game)
 
                 await game.createGameInDb()
 
                 console.log(`player1_id: ${game.player1} | player2_id: ${game.player2}`)
+                console.log(this.games)
 
                 player1.join(game_id)
                 player2.join(game_id)
@@ -79,7 +97,13 @@ class GameManager {
                 game.addPlayer(socket.user_id)
 
                 socket.join(game_id)
-                io.to(game_id).emit(START_GAME, { white: game.player1, black: game.player2 })
+
+                const timeData = {
+                    whiteTime: game.playerTimes['w'],
+                    blackTime: game.playerTimes['b'],
+                };
+
+                io.to(game_id).emit(START_GAME, { white: game.player1, black: game.player2, timeData })
 
                 callback({ success: true })
             } else {
