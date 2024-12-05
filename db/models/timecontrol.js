@@ -21,9 +21,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   TimeControl.init({
     time_control_id: {
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
-      type: DataTypes.STRING
+      type: DataTypes.INTEGER
     },
     game_id: {
       type: DataTypes.STRING,
@@ -38,10 +39,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical', 'Unlimited'),
     },
     base_time: {
-      type: DataTypes.STRING
+      type: DataTypes.INTEGER
     },
     increment_by_turn: {
-      type: DataTypes.STRING
+      type: DataTypes.INTEGER
     },
   }, {
     sequelize,

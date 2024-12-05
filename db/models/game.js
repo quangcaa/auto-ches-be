@@ -12,13 +12,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Game.belongsTo(models.User, {
-        as: 'game_white_player_id_fk',
+        as: 'whitePlayer',
         foreignKey: 'white_player_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
       });
       Game.belongsTo(models.User, {
-        as: 'game_black_player_id_fk',
+        as: 'blackPlayer',
         foreignKey: 'black_player_id',
         onUpdate: 'CASCASE',
         onDelete: 'CASCADE'
@@ -61,13 +61,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
-
     },
     end_time: {
       type: DataTypes.DATE,
     },
     result: {
       type: DataTypes.STRING
+    },
+    wtime: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    btime: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
     status: {
       type: DataTypes.STRING,

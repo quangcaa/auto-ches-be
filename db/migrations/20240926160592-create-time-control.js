@@ -4,9 +4,10 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('timeControls', {
       time_control_id: {
+      autoIncrement: true,
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       game_id: {
         type: Sequelize.STRING,
@@ -21,10 +22,10 @@ module.exports = {
         type: Sequelize.ENUM('Bullet', 'Blitz', 'Rapid', 'Classical', 'Unlimited'),
       },
       base_time: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       increment_by_turn: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
     });
   },

@@ -125,8 +125,7 @@ class InboxController {
     // @desc Delete an inbox
     // @access Private
     async deleteInbox(req, res) {
-        const my_id = 1
-        // req.user_id
+        const my_id = req.user_id
         const other_user_id = req.params.userId
     
         try {

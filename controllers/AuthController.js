@@ -292,30 +292,30 @@ class AuthController {
     async logout(req, res) {
         try {
             // get access-token from header
-            const accessTokenFromHeader = req.headers.x_authorization
-            if (!accessTokenFromHeader) {
-                return res.status(400).json({ success: false, message: 'Access token is missing' })
-            }
+            // const accessTokenFromHeader = req.headers.x_authorization
+            // if (!accessTokenFromHeader) {
+            //     return res.status(400).json({ success: false, message: 'Access token is missing' })
+            // }
 
             // decode access-token
-            const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
-            const decoded = await decodeToken(accessTokenFromHeader, accessTokenSecret)
-            if (!decoded) {
-                return res.status(400).json({ success: false, message: 'Invalid access token' })
-            }
+            // const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+            // const decoded = await decodeToken(accessTokenFromHeader, accessTokenSecret)
+            // if (!decoded) {
+            //     return res.status(400).json({ success: false, message: 'Invalid access token' })
+            // }
 
             // find user by user_id from decoded token
-            const user_id = decoded.payload.user_id
-            const user = await User.findByPk(user_id)
-            if (!user) {
-                return res.status(400).json({ success: false, message: 'User does not exist' })
-            }
+            // const user_id = decoded.payload.user_id
+            // const user = await User.findByPk(user_id)
+            // if (!user) {
+            //     return res.status(400).json({ success: false, message: 'User does not exist' })
+            // }
 
             // set refresh_token to null
-            await User.update(
-                { refresh_token: null },
-                { where: { user_id } }
-            )
+            // await User.update(
+            //     { refresh_token: null },
+            //     { where: { user_id } }
+            // )
 
             return res.status(200).json({ success: true, message: 'Logged out successfully' })
         } catch (error) {

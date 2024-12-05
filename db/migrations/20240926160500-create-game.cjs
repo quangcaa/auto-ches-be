@@ -39,6 +39,16 @@ module.exports = {
       result: {
         type: Sequelize.STRING,
       },
+      wtime: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      btime: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       status: {
         type: Sequelize.STRING,
       },
