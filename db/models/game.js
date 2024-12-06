@@ -14,13 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       Game.belongsTo(models.User, {
         as: 'whitePlayer',
         foreignKey: 'white_player_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
       Game.belongsTo(models.User, {
         as: 'blackPlayer',
         foreignKey: 'black_player_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
       Game.hasMany(models.Move, {

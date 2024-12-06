@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Profile.belongsTo(models.User, { 
         as: 'profile_user_id_fk', 
         foreignKey: 'user_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
     }

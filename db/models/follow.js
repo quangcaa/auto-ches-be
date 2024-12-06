@@ -14,13 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       Follow.belongsTo(models.User, { 
         as: 'follow_follower_id_fk', 
         foreignKey: 'follower_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
       Follow.belongsTo(models.User, { 
         as: 'follow_following_id_fk', 
         foreignKey: 'following_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
     }

@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Move.belongsTo(models.Game, { 
         as: 'game', 
         foreignKey: 'game_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
     }

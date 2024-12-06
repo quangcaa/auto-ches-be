@@ -14,13 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       Post.belongsTo(models.User, {
         as: 'post_user_id_fk',
         foreignKey: 'user_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
       Post.belongsTo(models.Topic, {
         as: 'post_topic_id_fk',
         foreignKey: 'topic_id',
-        onUpdate: 'CASCASE',
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       });
     }

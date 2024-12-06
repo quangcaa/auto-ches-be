@@ -187,12 +187,12 @@ class Game {
                 },
                 {
                     model: DbUser,
-                    as: 'game_black_player_id_fk', // Update alias to match Game's association
+                    as: 'blackPlayer',
                     attributes: ['user_id', 'username']
                 },
                 {
                     model: DbUser,
-                    as: 'game_white_player_id_fk', // Update alias to match Game's association
+                    as: 'whitePlayer',
                     attributes: ['user_id', 'username']
                 }
             ],
