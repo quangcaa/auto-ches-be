@@ -2,14 +2,16 @@ const { Game } = require('./Game')
 const shortid = require('shortid')
 const {
     CREATE_GAME,
-    GAME_CREATED,
-    START_GAME,
-    MOVE,
     JOIN_GAME,
+    START_NOW,
+    MOVE,
     LEAVE_GAME,
     GAME_OVER,
     SEND_MESSAGE,
-    JOIN_QUICK_PAIRING
+    JOIN_QUICK_PAIRING,
+    CANCEL_QUICK_PAIRING,
+    PAIRED,
+    CANCEL_PAIRED
 } = require('./message')
 
 class GameManager {
@@ -38,36 +40,6 @@ class GameManager {
             }
         })
 
-        socket.on(JOIN_QUICK_PAIRING, async (timeControl) => {
-            // check if player already in queue
-            const isAlreadyInQueue = this.playersQueue.some(
-                (player) => player.id === socket.id
-            )
-
-            // add player to queue
-            if (!isAlreadyInQueue) {
-                this.playersQueue.push({
-                    socket: socket,
-                    user_id: socket.user_id,
-                    timeControl: timeControl,
-                })
-            }
-
-            // matching 
-            this.matchPlayers(io)
-        })
-
-        socket.on('cancel_quick_pairing', (selectedTimeControl) => {
-            // remove player from queue
-            this.playersQueue = this.playersQueue.filter(
-                (player) => player.socket.id !== socket.id
-            )
-
-            console.log(`Player ${socket.user_id} has canceled quick pairing.`)
-
-            socket.emit('cancel_paired')
-        })
-
         socket.on(JOIN_GAME, (game_id, callback) => {
             const game = this.games.get(game_id)
             if (game) {
@@ -87,29 +59,48 @@ class GameManager {
 
                 socket.join(game_id)
 
-                const timeData = {
-                    whiteTime: game.playerTimes['w'],
-                    blackTime: game.playerTimes['b'],
-                }
-
-                io.to(game_id).emit('start_now', game_id)
-
-                io.to(game_id).emit(START_GAME, { white: game.player1, black: game.player2, timeData })
+                io.to(game_id).emit(START_NOW, game_id)
 
                 callback({ success: true })
             } else {
-                socket.emit('error', 'Room not found')
                 callback({ success: false, message: 'Game not found' })
             }
+        })
+
+        socket.on(JOIN_QUICK_PAIRING, async (timeControl) => {
+            // check if player already in queue
+            const isAlreadyInQueue = this.playersQueue.some(
+                (player) => player.id === socket.id
+            )
+
+            // add player to queue
+            if (!isAlreadyInQueue) {
+                this.playersQueue.push({
+                    socket: socket,
+                    user_id: socket.user_id,
+                    timeControl: timeControl,
+                })
+            }
+
+            // matching 
+            this.matchPlayers(io)
+        })
+
+        socket.on(CANCEL_QUICK_PAIRING, () => {
+            // remove player from queue
+            this.playersQueue = this.playersQueue.filter(
+                (player) => player.socket.id !== socket.id
+            )
+
+            socket.emit(CANCEL_PAIRED)
         })
 
         socket.on(MOVE, async ({ game_id, move }, callback) => {
             const game = this.games.get(game_id)
             if (game) {
-                console.log(`[gameMove]: game ${game_id}`)
                 game.makeMove(socket, move, callback, io)
             } else {
-                callback({ success: false, message: 'Game not found.' })
+                callback({ success: false, message: 'Game not found' })
             }
         })
 
@@ -161,12 +152,7 @@ class GameManager {
                     player2.socket.join(game_id)
 
                     // emit 
-                    io.to(game_id).emit('paired', game_id)
-
-                    io.to(game_id).emit(START_GAME, {
-                        white: game.player1,
-                        black: game.player2,
-                    })
+                    io.to(game_id).emit(PAIRED, game_id)
 
                     // after pairing, check to see if any other pairs are available
                     setImmediate(() => this.matchPlayers(io))

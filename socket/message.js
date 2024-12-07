@@ -1,35 +1,24 @@
-const GAME_CREATED = 'game_created'
-
-// game action
+// create, join game feature
 const CREATE_GAME = 'create_game'
 const JOIN_GAME = 'join_game'
-const LEAVE_GAME = 'leave_game'
-const START_GAME = 'start_game'
+const START_NOW = 'start_now'
+
+// game action
 const MOVE = 'move'
-const GAME_OVER = 'game_over'
-const RESIGN = 'resign'
+const LEAVE_GAME = 'leave_game'
 const DRAW_OFFER = 'draw_offer'
 const DRAW_RESPONSE = 'draw_response'
+const RESIGN = 'resign'
 
+// quick pairing feature
 const JOIN_QUICK_PAIRING = 'join_quick_pairing'
+const CANCEL_QUICK_PAIRING = 'cancel_quick_pairing'
+const PAIRED = 'paired'
+const CANCEL_PAIRED = 'cancel_paired'
 
+// chat room feature
 const SEND_MESSAGE = 'send_message'
 const RECEIVE_MESSAGE = 'receive_message'
-const NOTIFICATION_IN_GAME = 'notification_in_game'
-
-// inbox action
-const SEND_INBOX_MESSAGE = 'send_inbox_message'
-const RECEIVE_INBOX_MESSAGE = 'receive_inbox_message'
-
-const UPDATE_PLAYER_STATUS = 'update_player_status'
-const GET_ONLINE_PLAYERS = 'get_online_players'
-
-const INVITE_PLAYER = 'invite_player'
-const INVITE_RESPONSE = 'invite_response'
-
-// send notification
-const SEND_NOTIFICATION = 'send_notification'
-
 
 // game status
 const IN_PROGRESS = 'in_progress'
@@ -37,6 +26,7 @@ const COMPLETED = 'completed'
 const ABANDONED = 'abandoned'
 const TIME_OUT = 'time out'
 const PLAYER_EXIT = 'player_exit'
+const GAME_OVER = 'game_over'
 const CHECKMATE = 'Checkmate'
 
 // game result
@@ -44,22 +34,35 @@ const WHITE_WINS = 'White is victorious'
 const BLACK_WINS = 'Black is victorious'
 const DRAW = 'Draw'
 
+// inbox feature
+const SEND_INBOX_MESSAGE = 'send_inbox_message'
+const RECEIVE_INBOX_MESSAGE = 'receive_inbox_message'
+
+// notification
+const SEND_NOTIFICATION = 'send_notification'
+
+const INVITE_PLAYER = 'invite_player'
+const INVITE_RESPONSE = 'invite_response'
+
 module.exports = {
     CREATE_GAME,
     JOIN_GAME,
-    LEAVE_GAME,
-    GAME_CREATED,
-    START_GAME,
+    START_NOW,
+
+    JOIN_QUICK_PAIRING,
+    CANCEL_QUICK_PAIRING,
+    PAIRED,
+    CANCEL_PAIRED,
+
     MOVE,
+    LEAVE_GAME,
     GAME_OVER,
     RESIGN,
     DRAW_OFFER,
     DRAW_RESPONSE,
     SEND_MESSAGE,
     RECEIVE_MESSAGE,
-    NOTIFICATION_IN_GAME,
-    UPDATE_PLAYER_STATUS,
-    GET_ONLINE_PLAYERS,
+
     INVITE_PLAYER,
     INVITE_RESPONSE,
     IN_PROGRESS,
@@ -72,7 +75,7 @@ module.exports = {
     BLACK_WINS,
     DRAW,
     SEND_INBOX_MESSAGE,
-    RECEIVE_INBOX_MESSAGE, 
-    JOIN_QUICK_PAIRING,
+    RECEIVE_INBOX_MESSAGE,
+
     SEND_NOTIFICATION
 }

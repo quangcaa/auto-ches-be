@@ -45,7 +45,7 @@ class Game {
         if ((this.board.turn() === 'w' && socket.user_id !== this.player1) ||
             (this.board.turn() === 'b' && socket.user_id !== this.player2)) {
             console.log(`error move`)
-            callback({ success: false, message: 'Không phải lượt của bạn.' })
+            callback({ success: false, message: 'Not your turn' })
             return
         }
 
@@ -53,13 +53,12 @@ class Game {
         try {
             result = this.board.move(move)
         } catch (error) {
-            // console.error(`Invalid move attempted: ${JSON.stringify(move)}`, error);
-            callback({ success: false, message: 'Nước đi không hợp lệ.' })
+            callback({ success: false, message: 'Invalid move' })
             return
         }
 
         if (!result) {
-            callback({ success: false, message: 'Nước đi không hợp lệ.' })
+            callback({ success: false, message: 'Invalid move' })
             return
         }
 
@@ -170,8 +169,6 @@ class Game {
     }
 
     async exitGame(user_id) {
-        console.log('ran into Game/exitGame')
-
         this.endGame(PLAYER_EXIT, user_id === this.player1 ? BLACK_WINS : WHITE_WINS)
 
         return user_id === this.player1 ? BLACK_WINS : WHITE_WINS
