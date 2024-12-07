@@ -1,6 +1,6 @@
 const { Chess } = require('chess.js')
-const { sequelize, Game: DbGame, Move: DbMove, User: DbUser } = require('../db/models')
-const { PLAYER_EXIT, BLACK_WINS, WHITE_WINS, COMPLETED, GAME_OVER, MOVE, DRAW, RECEIVE_MESSAGE } = require('./message')
+const { sequelize, Game: DbGame, Move: DbMove, User: DbUser, TimeControl } = require('../db/models')
+const { PLAYER_EXIT, BLACK_WINS, WHITE_WINS, COMPLETED, CHECKMATE, GAME_OVER, MOVE, DRAW, RECEIVE_MESSAGE } = require('./message')
 
 class Game {
     constructor(player1, player2, game_id, timeControl) {
@@ -17,13 +17,14 @@ class Game {
         // this.player1TimeConsumed = 0
         // this.player2TimeConsumed = 0
 
+        this.timeControlName = timeControl.name
         this.baseTime = timeControl.base_time * 60 * 1000;
         this.increment = timeControl.increment_by_turn * 1000;
         this.playerTimes = {
             w: this.baseTime, // Convert minutes to milliseconds
             b: this.baseTime,
-          };
-          this.activePlayer = 'w';
+        };
+        this.activePlayer = 'w';
 
         // this.player1Time = this.base_time
         // this.player2Time = this.base_time
@@ -65,7 +66,7 @@ class Game {
         // // Calculate time spent
         const currentTime = Date.now();
         const timeSpent = currentTime - this.lastMoveTime;
-      
+
         // // Update active player's time
         this.playerTimes[this.activePlayer] -= timeSpent;
         if (this.playerTimes[this.activePlayer] <= 0) {
@@ -75,19 +76,19 @@ class Game {
 
         // Add increment after move
         this.playerTimes[this.activePlayer] += this.increment;
-        
+
         // // Update last move time and switch player
         this.lastMoveTime = currentTime;
         this.activePlayer = this.board.turn();
-      
+
         // // Emit time update to clients
         const timeData = {
             whiteTime: this.playerTimes['w'],
             blackTime: this.playerTimes['b'],
-          };
-          // Emit time update to both players
-          io.to(this.player1).emit('time_update', timeData);
-          io.to(this.player2).emit('time_update', timeData);
+        };
+        // Emit time update to both players
+        io.to(this.player1).emit('time_update', timeData);
+        io.to(this.player2).emit('time_update', timeData);
 
         const moveTimestamp = new Date(Date.now())
         await this.addMoveToDb(result, moveTimestamp)
@@ -103,9 +104,6 @@ class Game {
                 result = this.board.turn() === 'w' ? BLACK_WINS : WHITE_WINS;
             }
             else if (
-                this.board.isStalemate() ||
-                this.board.isInsufficientMaterial() ||
-                this.board.isThreefoldRepetition() ||
                 this.board.isDraw() ||
                 this.board.ply() >= 1000
             ) {
@@ -133,6 +131,13 @@ class Game {
             start_time: this.startTime,
             status: 'IN_PROGRESS',
             fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        })
+
+        const gameTime = await TimeControl.create({
+            game_id: this.game_id,
+            time_control_name: this.timeControlName,
+            base_time: this.baseTime,
+            increment_by_turn: this.increment
         })
     }
 

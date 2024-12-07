@@ -35,13 +35,14 @@ const SEND_NOTIFICATION = 'send_notification'
 const IN_PROGRESS = 'in_progress'
 const COMPLETED = 'completed'
 const ABANDONED = 'abandoned'
-const TIME_UP = 'time_up'
+const TIME_OUT = 'time out'
 const PLAYER_EXIT = 'player_exit'
+const CHECKMATE = 'Checkmate'
 
 // game result
-const WHITE_WINS = 'white_wins'
-const BLACK_WINS = 'black_wins'
-const DRAW = 'draw'
+const WHITE_WINS = 'White is victorious'
+const BLACK_WINS = 'Black is victorious'
+const DRAW = 'Draw'
 
 module.exports = {
     CREATE_GAME,
@@ -63,8 +64,9 @@ module.exports = {
     INVITE_RESPONSE,
     IN_PROGRESS,
     COMPLETED,
+    CHECKMATE,
     ABANDONED,
-    TIME_UP,
+    TIME_OUT,
     PLAYER_EXIT,
     WHITE_WINS,
     BLACK_WINS,

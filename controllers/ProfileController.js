@@ -34,10 +34,14 @@ class ProfileController {
                 SELECT 
                     g.*,
                     wu.username AS white_player_username,
-                    bu.username AS black_player_username
+                    bu.username AS black_player_username,
+                    tc.time_control_name,
+                    tc.base_time,
+                    tc.increment_by_turn
                 FROM games g
                 LEFT JOIN users wu ON g.white_player_id = wu.user_id
                 LEFT JOIN users bu ON g.black_player_id = bu.user_id
+                LEFT JOIN timecontrols tc ON g.game_id = tc.game_id
                 WHERE g.white_player_id = ? OR g.black_player_id = ?
                 ORDER BY g.start_time DESC
                 `,
@@ -46,6 +50,21 @@ class ProfileController {
                     type: sequelize.QueryTypes.SELECT,
                 }
             )
+
+            // fetch count of user posts
+            const userPostCountData = await sequelize.query(
+                `
+                SELECT COUNT(*) AS post_count
+                FROM posts
+                WHERE user_id = ?
+                `,
+                {
+                    replacements: [userProfile[0].user_id],
+                    type: sequelize.QueryTypes.SELECT,
+                }
+            )
+            const postCount = userPostCountData[0].post_count || 0
+            userProfile[0].post_count = postCount
 
             return res.status(200).json({ success: true, profile: userProfile[0], games: userGames })
         } catch (error) {
@@ -137,7 +156,7 @@ class ProfileController {
             // fetch follower list
             const followerList = await sequelize.query(
                 `  
-                SELECT f.follower_id, u.username
+                SELECT f.follower_id, u.username, u.online
                 FROM follows f
                 JOIN users u ON u.user_id = f.follower_id
                 WHERE f.following_id = ?

@@ -81,7 +81,7 @@ class GameManager {
                 if (game.player2) {
                     callback({ success: false, message: 'Game is already full' })
                     return
-                  }
+                }
 
                 game.addPlayer(socket.user_id)
 
@@ -138,44 +138,44 @@ class GameManager {
     // matching
     async matchPlayers(io) {
         for (let i = 0; i < this.playersQueue.length; i++) {
-          const player1 = this.playersQueue[i]
-      
-          for (let j = i + 1; j < this.playersQueue.length; j++) {
-            const player2 = this.playersQueue[j]
-      
-            if (player1.user_id !== player2.user_id) {
-              // found 2 different players, eliminate from queue
-              // eliminate player2 first so as not to affect player1's stats
-              this.playersQueue.splice(j, 1)
-              this.playersQueue.splice(i, 1)
-      
-              // create game
-              const game_id = shortid.generate()
-              const game = new Game(player1.user_id , player2.user_id, game_id, player1.timeControl)
-              this.games.set(game_id, game)
+            const player1 = this.playersQueue[i]
 
-                await game.createGameInDb()
+            for (let j = i + 1; j < this.playersQueue.length; j++) {
+                const player2 = this.playersQueue[j]
 
-              // add to socket room
-              player1.socket.join(game_id)
-              player2.socket.join(game_id)
-      
-              // emit 
-              io.to(game_id).emit('paired', game_id)
-      
-              io.to(game_id).emit(START_GAME, {
-                white: game.player1,
-                black: game.player2,
-              })
-      
-              // after pairing, check to see if any other pairs are available
-              setImmediate(() => this.matchPlayers(io))
-      
-              return
+                if (player1.user_id !== player2.user_id) {
+                    // found 2 different players, eliminate from queue
+                    // eliminate player2 first so as not to affect player1's stats
+                    this.playersQueue.splice(j, 1)
+                    this.playersQueue.splice(i, 1)
+
+                    // create game
+                    const game_id = shortid.generate()
+                    const game = new Game(player1.user_id, player2.user_id, game_id, player1.timeControl)
+                    this.games.set(game_id, game)
+
+                    await game.createGameInDb()
+
+                    // add to socket room
+                    player1.socket.join(game_id)
+                    player2.socket.join(game_id)
+
+                    // emit 
+                    io.to(game_id).emit('paired', game_id)
+
+                    io.to(game_id).emit(START_GAME, {
+                        white: game.player1,
+                        black: game.player2,
+                    })
+
+                    // after pairing, check to see if any other pairs are available
+                    setImmediate(() => this.matchPlayers(io))
+
+                    return
+                }
             }
-          }
         }
-      }
+    }
 
 
     // xoa game
