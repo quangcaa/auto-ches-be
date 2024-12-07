@@ -41,6 +41,15 @@ class InboxController {
                              LIMIT 1)
                         `), 
                         'last_message'
+                    ],
+                    [
+                        sequelize.literal(`
+                            CASE 
+                                WHEN sender_id = ${my_id} THEN Receiver.online 
+                                ELSE Sender.online 
+                            END
+                        `), 
+                        'online'
                     ]
                 ],
                 include: [
@@ -66,7 +75,7 @@ class InboxController {
                         { game_id: null }
                     ]
                 },
-                group: ['user_id', 'user_name'],
+                group: ['user_id', 'user_name', 'online'],
                 raw: true,
             })
 

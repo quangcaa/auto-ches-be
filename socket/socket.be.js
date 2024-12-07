@@ -37,12 +37,13 @@ const initSocket = (httpServer) => {
 
 
     io.on('connection', (socket) => {
-        connected_users.set(socket.user_id, socket)
+        connected_users.set(socket.user_id, socket.id)
         console.log(`[SOCKET]: User [${socket.user_id}] connected.`)
 
         io.emit('user_online', { user_id: socket.user_id })
 
         socket.on(SEND_INBOX_MESSAGE, async (data) => {
+            console.log('get message')
             await handleSendMessage(data, io, connected_users)
         })
 
