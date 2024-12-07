@@ -99,6 +99,9 @@ class GameManager {
             const game = this.games.get(game_id)
             if (game) {
                 game.makeMove(socket, move, callback, io)
+
+                // broadcast for all spectator
+                io.to(game_id).emit('game_state_update', game.getGameState());
             } else {
                 callback({ success: false, message: 'Game not found' })
             }
@@ -124,6 +127,21 @@ class GameManager {
 
             io.to(game_id).emit(GAME_OVER, result)
         })
+
+        socket.on('join_spectator', (game_id, callback) => {
+            const game = this.games.get(game_id);
+            if (game) {
+                socket.join(game_id);
+        
+                // Send the current game state to the spectator
+                socket.emit('game_state', game.getGameState());
+        
+                callback({ success: true });
+                console.log(`User ${socket.user_id} is now spectating game ${game_id}`);
+            } else {
+                callback({ success: false, message: 'Game not found' });
+            }
+        });
     }
 
     // matching

@@ -14,20 +14,14 @@ class Game {
         this.moveTimer = null // dong ho move
         this.startTime = new Date(Date.now()) // thoi gian bat dau
         this.lastMoveTime = new Date(Date.now())
-        // this.player1TimeConsumed = 0
-        // this.player2TimeConsumed = 0
-
         this.timeControlName = timeControl.name
         this.baseTime = timeControl.base_time * 60 * 1000;
         this.increment = timeControl.increment_by_turn * 1000;
         this.playerTimes = {
-            w: this.baseTime, // Convert minutes to milliseconds
+            w: this.baseTime, // milliseconds
             b: this.baseTime,
         };
         this.activePlayer = 'w';
-
-        // this.player1Time = this.base_time
-        // this.player2Time = this.base_time
     }
 
     async addPlayer(player2) {
@@ -86,8 +80,7 @@ class Game {
             blackTime: this.playerTimes['b'],
         };
         // Emit time update to both players
-        io.to(this.player1).emit('time_update', timeData);
-        io.to(this.player2).emit('time_update', timeData);
+        io.to(this.game_id).emit('time_update', timeData);
 
         const moveTimestamp = new Date(Date.now())
         await this.addMoveToDb(result, moveTimestamp)
@@ -208,6 +201,18 @@ class Game {
         /*
         * send socket
         */
+    }
+
+    getGameState() {
+        return {
+            fen: this.board.fen(),
+            pgn: this.board.pgn(),
+            moveHistory: this.board.history(),
+            playerTimes: this.playerTimes,
+            lastMoveTime: this.lastMoveTime,
+            activePlayer: this.activePlayer,
+            result: this.result,
+        };
     }
 }
 
