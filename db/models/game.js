@@ -62,8 +62,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    end_time: {
-      type: DataTypes.DATE,
+    reason: {
+      type: DataTypes.STRING
     },
     result: {
       type: DataTypes.STRING
@@ -84,6 +84,10 @@ module.exports = (sequelize, DataTypes) => {
     fen: {
       type: DataTypes.STRING,
       defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    },
+    pgn: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
   }, {
     sequelize,

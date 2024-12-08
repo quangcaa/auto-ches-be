@@ -33,8 +33,8 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
-      end_time: {
-        type: Sequelize.DATE
+      reason: {
+        type: Sequelize.STRING,
       },
       result: {
         type: Sequelize.STRING,
@@ -55,6 +55,10 @@ module.exports = {
       fen: {
         type: Sequelize.STRING,
         defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+      },
+      pgn: {
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
     });
   },

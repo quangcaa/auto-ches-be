@@ -22,6 +22,7 @@ class Game {
             b: this.baseTime,
         };
         this.activePlayer = 'w';
+        this.status = 'PENDING'
     }
 
     async addPlayer(player2) {
@@ -56,18 +57,26 @@ class Game {
             return
         }
 
-        // // Calculate time spent
+        // Change status to IN_PROGRESS on the first move
+    if (this.status === 'PENDING' && this.board.turn() === 'b') {
+        this.status = 'IN_PROGRESS';
+        await DbGame.update(
+          { status: 'IN_PROGRESS' },
+          { where: { game_id: this.game_id } }
+        );
+      }
+
+        // calculate time spent
         const currentTime = Date.now();
         const timeSpent = currentTime - this.lastMoveTime;
 
-        // // Update active player's time
+        // update active player's time
         this.playerTimes[this.activePlayer] -= timeSpent;
         if (this.playerTimes[this.activePlayer] <= 0) {
-            this.endGame(`${this.activePlayer === 'w' ? 'Black' : 'White'} wins on time.`);
             return;
         }
 
-        // Add increment after move
+        // add increment after move
         this.playerTimes[this.activePlayer] += this.increment;
 
         // // Update last move time and switch player
@@ -79,6 +88,7 @@ class Game {
             whiteTime: this.playerTimes['w'],
             blackTime: this.playerTimes['b'],
         };
+        
         // Emit time update to both players
         io.to(this.game_id).emit('time_update', timeData);
 
@@ -102,7 +112,7 @@ class Game {
                 result = DRAW;
             }
 
-            await this.endGame(COMPLETED, result)
+            await this.endGame(io, "FINISHED", 'Checkmate', result)
 
             io.to(this.game_id).emit(GAME_OVER, result)
         }
@@ -120,8 +130,8 @@ class Game {
             game_id: this.game_id,
             white_player_id: this.player1,
             black_player_id: this.player2 ?? null,
-            start_time: this.startTime,
-            status: 'IN_PROGRESS',
+            start_time: this.startTime, 
+            status: this.status,
             fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         })
 
@@ -149,8 +159,10 @@ class Game {
                 created_at: moveTimestamp,
             }, { transaction })
 
+            const pgn = this.board.pgn();
+
             await DbGame.update(
-                { fen: move.after },
+                { fen: move.after, pgn: pgn },
                 { where: { game_id: this.game_id }, transaction }
             )
 
@@ -161,46 +173,19 @@ class Game {
         }
     }
 
-    async exitGame(user_id) {
-        this.endGame(PLAYER_EXIT, user_id === this.player1 ? BLACK_WINS : WHITE_WINS)
+    async exitGame(io, user_id) {
+        this.endGame(io, 'ABANDONED', user_id === this.player1 ? "White exit" : "Black exit", user_id === this.player1 ? BLACK_WINS : WHITE_WINS)
 
         return user_id === this.player1 ? BLACK_WINS : WHITE_WINS
     }
 
-    async endGame(status, result) {
+    async endGame(io, status, reason, result) {
         const updatedGame = await DbGame.update(
-            { status, result },
+            { status, reason, result },
             { where: { game_id: this.game_id } }
         )
 
-        const gameDetails = await DbGame.findOne({
-            where: { game_id: this.game_id },
-            include: [
-                {
-                    model: DbMove,
-                    as: 'moves', // This should match the alias in Game.hasMany
-                },
-                {
-                    model: DbUser,
-                    as: 'blackPlayer',
-                    attributes: ['user_id', 'username']
-                },
-                {
-                    model: DbUser,
-                    as: 'whitePlayer',
-                    attributes: ['user_id', 'username']
-                }
-            ],
-            order: [
-                [{ model: DbMove, as: 'moves' }, 'move_number', 'ASC']
-            ]
-        })
-
-        console.log(gameDetails)
-
-        /*
-        * send socket
-        */
+        io.to(this.game_id).emit(GAME_OVER, result);
     }
 
     getGameState() {

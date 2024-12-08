@@ -119,13 +119,18 @@ class GameManager {
 
             let result
             if (game) {
-                result = await game.exitGame(socket.user_id)
+                result = await game.exitGame(io, socket.user_id)
                 this.removeGame(game_id)
             }
-            console.log(`user left room: ${game_id}`)
-            console.log(`result ${result}`)
+        })
 
-            io.to(game_id).emit(GAME_OVER, result)
+        socket.on(GAME_OVER, async ({game_id, reason, result}) => {
+            const game = this.games.get(game_id)
+
+            if (game) {
+                result = await game.endGame(io, 'FINISHED', reason, result)
+                this.removeGame(game_id)
+            }
         })
 
         socket.on('join_spectator', (game_id, callback) => {
@@ -180,7 +185,6 @@ class GameManager {
             }
         }
     }
-
 
     // xoa game
     removeGame(game_id) {
