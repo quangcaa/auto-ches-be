@@ -114,7 +114,7 @@ class Game {
 
             await this.endGame(io, "FINISHED", 'Checkmate', result)
 
-            io.to(this.game_id).emit(GAME_OVER, result)
+            io.to(this.game_id).emit(GAME_OVER, `${reason} • ${result}`)
         }
     }
 
@@ -185,7 +185,7 @@ class Game {
             { where: { game_id: this.game_id } }
         )
 
-        io.to(this.game_id).emit(GAME_OVER, result);
+        io.to(this.game_id).emit(GAME_OVER, `${reason} • ${result}`);
     }
 
     getGameState() {

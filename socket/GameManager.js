@@ -21,13 +21,19 @@ class GameManager {
     }
 
     handleEvent(socket, io, connected_users) {
-        console.log("ran into GameManager/handleEvent")
-
         socket.on(CREATE_GAME, async (timeControl, callback) => {
             try {
                 const game_id = shortid.generate()
 
-                const newGame = new Game(socket.user_id, null, game_id, timeControl)
+                const newGame = new Game(null, null, game_id, timeControl)
+                if (timeControl.side === "white") {
+                    newGame.player1 = socket.user_id
+                  } else if (timeControl.side === "black") {
+                    newGame.player2 = socket.user_id
+                  } else {
+                    newGame.player1 = socket.user_id
+                  }
+
                 this.games.set(game_id, newGame)
 
                 socket.join(game_id)
@@ -40,26 +46,35 @@ class GameManager {
             }
         })
 
-        socket.on(JOIN_GAME, (game_id, callback) => {
+        socket.on(JOIN_GAME, async (game_id, callback) => {
             const game = this.games.get(game_id)
             if (game) {
-                if (socket.user_id === game.player1) {
+                if (socket.user_id === game.player1 || socket.user_id === game.player2) {
                     // prevent the creator from joining their own game
                     callback({ success: false, message: 'You cannot join your own game' })
                     return
                 }
 
                 // Check if the game already has two players
-                if (game.player2) {
+                if (game.player1 && game.player2) {
                     callback({ success: false, message: 'Game is already full' })
                     return
                 }
 
-                game.addPlayer(socket.user_id)
+                if (game.player1) {
+                    game.player2 = socket.user_id
+                } else {
+                    game.player1 = socket.user_id
+                }
+
+                // game.addPlayer(socket.user_id)
+                await game.createGameInDb()
 
                 socket.join(game_id)
 
                 io.to(game_id).emit(START_NOW, game_id)
+
+                io.emit('update_lobby', Array.from(this.games.values()))
 
                 callback({ success: true })
             } else {
@@ -135,17 +150,20 @@ class GameManager {
 
         socket.on('join_spectator', (game_id, callback) => {
             const game = this.games.get(game_id);
-            if (game) {
-                socket.join(game_id);
-        
-                // Send the current game state to the spectator
-                socket.emit('game_state', game.getGameState());
-        
-                callback({ success: true });
-                console.log(`User ${socket.user_id} is now spectating game ${game_id}`);
-            } else {
-                callback({ success: false, message: 'Game not found' });
+
+            if (!game) {
+                return callback({ success: false, message: 'Game not found' });
             }
+
+            socket.join(game_id);
+        
+            // send the current game state to the spectator
+            socket.emit('game_state', game.getGameState());
+            callback({ success: true });
+        });
+
+        socket.on("request_lobby", () => {
+            io.emit("update_lobby", Array.from(this.games.values()));
         });
     }
 
@@ -179,6 +197,8 @@ class GameManager {
 
                     // after pairing, check to see if any other pairs are available
                     setImmediate(() => this.matchPlayers(io))
+
+                    io.emit("update_lobby", Array.from(this.games.values()));
 
                     return
                 }
