@@ -44,6 +44,10 @@ module.exports = (sequelize, DataTypes) => {
     online: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    role: {
+      type: DataTypes.STRING,
+      defaultValue: 'user'
     }
   }, {
     sequelize,

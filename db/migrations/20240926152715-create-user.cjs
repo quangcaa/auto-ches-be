@@ -34,6 +34,10 @@ module.exports = {
       online: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+      },
+      role: {
+        type: Sequelize.STRING,
+        defaultValue: 'user'
       }
     });
   },
