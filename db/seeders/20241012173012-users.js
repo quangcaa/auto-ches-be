@@ -25,6 +25,14 @@ module.exports = {
         joined_date: new Date(),
         refresh_token: null
       },
+      {
+        username: 'admin',
+        email: 'admin@gmail.com',
+        password: '$2a$12$eoGfe8LmhtF9kr5nBMm.MOPE/beTQgJRx6NLGYAyBt.C2ei7JA7dG',
+        joined_date: new Date(),
+        refresh_token: null,
+        role: 'admin'
+      },
     ], {});
   },
 
