@@ -8,6 +8,7 @@ const { verifyToken } = require('../utils/authen')
 const isAuth = async (req, res, next) => {
     // get access-token from header
     const accessTokenFromHeader = req.headers.x_authorization
+    console.log(req.headers)
     if (!accessTokenFromHeader) {
         return res.status(400).json({ success: false, message: 'Access token not found' })
     }

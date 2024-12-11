@@ -18,7 +18,12 @@ const httpServer = createServer(app)
 
 initSocket(httpServer) // init socket
 
-app.use(cors())
+app.use(cors({
+    origin: 'http://fall2024c8g4.int3306.freeddns.org/',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'x_authorization'],
+}))
 app.use(express.json()) // allow parse req.body
 app.use(cookieParser()) // allow parse cookies
 app.use(express.urlencoded({ extended: true })) // allow parse URL-encoded
