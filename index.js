@@ -19,9 +19,8 @@ const httpServer = createServer(app)
 initSocket(httpServer) // init socket
 
 app.use(cors({
-    origin: 'http://fall2024c8g4.int3306.freeddns.org/',
+    origin: 'http://fall2024c8g4.int3306.freeddns.org',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'x_authorization'],
 }))
 app.use(express.json()) // allow parse req.body
@@ -32,7 +31,6 @@ app.use(express.urlencoded({ extended: true })) // allow parse URL-encoded
 app.use(express.static(path.join(__dirname, 'dist')))
 
 route(app) // routes init
-// app.use('/api', route)
 
 // catch-all route
 app.get('*', (req, res) => {
