@@ -13,8 +13,8 @@ class ForumController {
                        COUNT(DISTINCT t.topic_id) AS topic_count, 
                        COUNT(p.post_id) AS post_count
                 FROM forum f
-                JOIN topics t ON t.category_id = f.category_id
-                JOIN posts p ON p.topic_id = t.topic_id
+                LEFT JOIN topics t ON t.category_id = f.category_id
+                LEFT JOIN posts p ON p.topic_id = t.topic_id
                 GROUP BY f.category_id
                 `,
                 {

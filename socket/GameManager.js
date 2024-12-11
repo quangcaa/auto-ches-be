@@ -175,7 +175,11 @@ class GameManager {
             for (let j = i + 1; j < this.playersQueue.length; j++) {
                 const player2 = this.playersQueue[j]
 
-                if (player1.user_id !== player2.user_id) {
+                if (
+                    player1.user_id !== player2.user_id &&
+                    player1.timeControl.base_time === player2.timeControl.base_time &&
+                    player1.timeControl.increment_by_turn === player2.timeControl.increment_by_turn
+                ) {
                     // found 2 different players, eliminate from queue
                     // eliminate player2 first so as not to affect player1's stats
                     this.playersQueue.splice(j, 1)
