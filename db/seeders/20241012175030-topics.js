@@ -12,7 +12,7 @@ module.exports = {
       },
       {
         category_id: 'GCD',
-        user_id: 2,
+        user_id: 1,
         subject: 'Chess Strategies and Tips',
         created_at: new Date()
       },
@@ -24,7 +24,7 @@ module.exports = {
       },
       {
         category_id: 'AF',
-        user_id: 2,
+        user_id: 1,
         subject: 'Feature Request: Dark Mode',
         created_at: new Date()
       },
@@ -36,7 +36,7 @@ module.exports = {
       },
       {
         category_id: 'GA',
-        user_id: 2,
+        user_id: 1,
         subject: 'Best Opening Moves',
         created_at: new Date()
       },
@@ -48,22 +48,10 @@ module.exports = {
       },
       {
         category_id: 'OTD',
-        user_id: 2,
+        user_id: 1,
         subject: 'Chess Memes',
         created_at: new Date()
       },
-      {
-        category_id: 'GCD',
-        user_id: 1,
-        subject: 'Chess Tournaments',
-        created_at: new Date()
-      },
-      {
-        category_id: 'AF',
-        user_id: 2,
-        subject: 'Autochess Feedback and Suggestions',
-        created_at: new Date()
-      }
     ], {});
   },
 
