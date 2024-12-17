@@ -19,9 +19,9 @@ const httpServer = createServer(app)
 initSocket(httpServer) // init socket
 
 app.use(cors({
-    origin: 'http://fall2024c8g4.int3306.freeddns.org',
+    origin: '*',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'x_authorization'],
+    // allowedHeaders: ['Content-Type', 'x_authorization'],
 }))
 app.use(express.json()) // allow parse req.body
 app.use(cookieParser()) // allow parse cookies

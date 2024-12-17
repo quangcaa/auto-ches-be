@@ -67,7 +67,7 @@ class AuthController {
 
             // generate refresh token
             const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE
-            const refreshTokenSecret = process.env.REFRESH_TOKEN_LIFE
+            const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
             const dataForRefreshToken = {
                 user_id: user.toJSON().user_id,
             }
@@ -186,7 +186,7 @@ class AuthController {
 
             // generate refresh token
             const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE
-            const refreshTokenSecret = process.env.REFRESH_TOKEN_LIFE
+            const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
             const dataForRefreshToken = {
                 user_id: user.user_id,
             }
