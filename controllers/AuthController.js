@@ -234,7 +234,7 @@ class AuthController {
     async refreshToken(req, res) {
         try {
             // get access-token from header
-            const accessTokenFromHeader = req.headers['Authorization']?.split(' ')[1];
+            const accessTokenFromHeader = req.headers['authorization']?.split(' ')[1]
             if (!accessTokenFromHeader) {
                 return res.status(400).json({ success: false, message: 'Access token is missing' })
             }
