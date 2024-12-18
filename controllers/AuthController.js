@@ -67,7 +67,7 @@ class AuthController {
 
             // generate refresh token
             const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE
-            const refreshTokenSecret = process.env.REFRESH_TOKEN_LIFE
+            const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
             const dataForRefreshToken = {
                 user_id: user.toJSON().user_id,
             }
@@ -186,7 +186,7 @@ class AuthController {
 
             // generate refresh token
             const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE
-            const refreshTokenSecret = process.env.REFRESH_TOKEN_LIFE
+            const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
             const dataForRefreshToken = {
                 user_id: user.user_id,
             }
@@ -234,7 +234,7 @@ class AuthController {
     async refreshToken(req, res) {
         try {
             // get access-token from header
-            const accessTokenFromHeader = req.headers.x_authorization
+            const accessTokenFromHeader = req.headers['authorization']?.split(' ')[1]
             if (!accessTokenFromHeader) {
                 return res.status(400).json({ success: false, message: 'Access token is missing' })
             }

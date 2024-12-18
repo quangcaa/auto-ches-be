@@ -18,7 +18,7 @@ const initSocket = (httpServer) => {
     io = new Server(httpServer, {
         connectionStateRecovery: {},
         cors: {
-            origin: CLIENT_URL,
+            origin: '*',
             credentials: true,
         }
     })
