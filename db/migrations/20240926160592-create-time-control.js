@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('timeControls', {
+    await queryInterface.createTable('timecontrols', {
       time_control_id: {
       autoIncrement: true,
         allowNull: false,
@@ -30,6 +30,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('timeControls');
+    await queryInterface.dropTable('timecontrols');
   }
 };
