@@ -1,8 +1,8 @@
 # ![favicon](dist/favicon-32x32.png) Auto Chess
 
 PROJECT - Web Application Development (INT3306 8) - UET <br>
-Auto Chess is an online chess web application where users can create rooms, join games, and compete with friends or random opponents. The application is built with a user-friendly interface and smooth gameplay experience. <br>
-[auto-chess-fe](https://github.com/quangcaa/auto-chess-fe-2)
+Auto Chess is an online chess web application where users can create rooms, join games, and compete with friends or random opponents. The application is built with a user-friendly interface and smooth gameplay experience.
+- FE: [auto-chess-fe](https://github.com/quangcaa/auto-chess-fe-2)
 
 ---
 
