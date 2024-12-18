@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'TimeControl',
-    tableName: 'timeControls',
+    tableName: 'timecontrols',
     timestamps: false
   });
   return TimeControl;
