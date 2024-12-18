@@ -11,7 +11,7 @@ class ForumController {
                 `
                 SELECT f.*,
                        COUNT(DISTINCT t.topic_id) AS topic_count, 
-                       COALESCE(p.post_id) AS post_count
+                       COUNT(p.post_id) AS post_count
                 FROM forum f
                 LEFT JOIN topics t ON t.category_id = f.category_id
                 LEFT JOIN posts p ON p.topic_id = t.topic_id
