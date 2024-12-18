@@ -3,7 +3,7 @@
 PROJECT - Web Application Development (INT3306 8) - UET <br>
 Auto Chess is an online chess web application where users can create rooms, join games, and compete with friends or random opponents. The application is built with a user-friendly interface and smooth gameplay experience.
 - FE: [auto-chess-fe](https://github.com/quangcaa/auto-chess-fe-2)
-
+  
 ---
 
 ## 🚀 **Main Features**
@@ -97,3 +97,13 @@ npx sequelize-cli db:seed:all
 ```bash
 npm start
 ```
+
+---
+
+## 🤝 **Contributors**
+
+- [@quangcaa](https://github.com/quangcaa)
+- [@22026541-dxtruong](https://github.com/22026541-dxtruong)
+- [@ductantb](https://github.com/ductantb)
+- [@QuangVu04](https://github.com/QuangVu04)
+- [@AnNgoexe](https://github.com/AnNgoexe)
