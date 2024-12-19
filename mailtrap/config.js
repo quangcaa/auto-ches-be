@@ -10,7 +10,7 @@ const client = new MailtrapClient({
 })
 
 const sender = {
-    email: "autochess@fall2024c8g4.int3306.freeddns.org",
+    email: "hello@demomailtrap.com",
     name: "♟ Auto Chess",
 };
 
