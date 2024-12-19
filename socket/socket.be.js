@@ -12,8 +12,6 @@ let io
 const connected_users = new Map() // online users
 const gameManager = new GameManager() // instance
 
-const CLIENT_URL = process.env.CLIENT_URL
-
 const initSocket = (httpServer) => {
     io = new Server(httpServer, {
         connectionStateRecovery: {},

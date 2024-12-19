@@ -351,9 +351,7 @@ class AuthController {
             })
 
             // send email
-            // await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}:${process.env.PORT}/reset-password/${resetToken}`)
-
-            console.log(`${process.env.CLIENT_URL}/reset-password/${resetToken}`)
+            await sendPasswordResetEmail(user.email, `${process.env.VITE_URL}/reset-password/${resetToken}`)
 
             return res.status(200).json({ success: true, message: 'Password reset link sent to your email' })
         } catch (error) {
@@ -387,8 +385,6 @@ class AuthController {
 
             // hash new password
             const hashedPassword = await bcryptjs.hash(password, 12)
-
-            console.log(resetRequest)
 
             // udpate new password
             await User.update(

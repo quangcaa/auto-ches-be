@@ -10,15 +10,15 @@ const client = new MailtrapClient({
 })
 
 const sender = {
-    email: "hello@demomailtrap.com",
-    name: "♟Auto Chess",
-}
+    email: "autochess@fall2024c8g4.int3306.freeddns.org",
+    name: "♟ Auto Chess",
+};
 
 // const recipients = [
 //     {
 //         email: "halloitsme115@gmail.com",
 //     }
-// ]
+// ];
 
 // client
 //     .send({

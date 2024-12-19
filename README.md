@@ -72,8 +72,6 @@ MYSQL_DB_HOST=localhost
 MYSQL_DB_PORT=3306
 
 MAILTRAP_TOKEN=your_mailtrap_token
-
-CLIENT_URL=http://localhost:5173
 ```
 
 ### **4. Install Dependencies**
